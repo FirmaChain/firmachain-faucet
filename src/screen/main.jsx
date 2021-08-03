@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Paper, InputBase, Divider, IconButton } from '@material-ui/core'
+import { Paper, InputBase, Divider, IconButton, Typography, Card, CardContent } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, MainTitle, HeaderBox } from '../utils/public_style';
+import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, MainTitle, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
 import { Wallet } from '../utils/wallet';
 
@@ -110,12 +110,13 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-
     const [sendingState, setSendingState] = useState(false);
+
+    const [resultLog, setResultLog] = useState(null)
 
     const classes = useStyles();
     const [sendAddressInput, setSendAddressInput] = useState('');
-    
+
     const { 
         sendTokenFromFaucet,
      } = Wallet();
@@ -123,16 +124,24 @@ export default function Main() {
     const moveToExplorer = () => {
         window.open('https://explorer-devnet.firmachain.org/', '_blank')
     }
+    
+    const moveToExplorerTransaction = (hash) => {
+        window.open('https://explorer-devnet.firmachain.org/transactions/'+hash, '_blank')
+    }
 
     const handleSendAddressInputText = (event) => {
         setSendAddressInput(event.target.value);
+    }
+    
+    const resetSendAddressInputText = () => {
+        setSendAddressInput('');
     }
     
     const activateSendProcess = () => {
         if(sendAddressInput === ''){
             return;
         }
-        setSendingState(true);
+        sendAddress();
     }
 
     const sendAddress = async() => {
@@ -144,17 +153,23 @@ export default function Main() {
             let testFCTAmount = 1000; // 2000fct(테라 기준)
             let result = await sendTokenFromFaucet(sendAddressInput, testFCTAmount);
             console.log(result.code);
+            const resultCode = result.code === 0? 'Success':result.code;
+            setResultLog({
+                code : resultCode,
+                gasUsed: result.gasUsed,
+                gasWanted: result.gasWanted,
+                height: result.height,
+                transactionHash: result.transactionHash,
+                rawLog: result.rawLog
+            })
+
+            resetSendAddressInputText();
             setSendingState(false);
         } catch (error) {
+            console.log("[error] " + error);
             setSendingState(false);
         }
     }
-
-    useEffect(() => {
-        if(sendingState){
-            sendAddress();
-        }
-    }, [sendingState])
 
     return (
         <>
@@ -201,6 +216,55 @@ export default function Main() {
                             </Paper>
                         </Wrapper>
                     </MainBox>
+
+                    {resultLog &&
+                    <LogBox>
+                        <Card className={classes.card}>
+                            <CardContent>
+                                <LogSendTag>{resultLog.code}</LogSendTag>
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        hash
+                                    </Typography>
+                                </LogCardWrapper>
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        <a style={{color: '#1D86FF', cursor: 'pointer'}} onClick={()=>moveToExplorerTransaction(resultLog.transactionHash)}>{resultLog.transactionHash}</a>
+                                    </Typography>
+                                </LogCardWrapper>
+                                <Divider />
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        gasUsed
+                                    </Typography>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        {resultLog.gasUsed} 
+                                    </Typography>
+                                </LogCardWrapper>
+                                <Divider />
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        gasWanted
+                                    </Typography>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        {resultLog.gasWanted} 
+                                    </Typography>
+                                </LogCardWrapper>
+                                <Divider />
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        rawLog
+                                    </Typography>
+                                </LogCardWrapper>
+                                <LogCardWrapper>
+                                    <Typography className={classes.card_text} variant="body2" component="p">
+                                        {resultLog.rawLog}
+                                    </Typography>
+                                </LogCardWrapper>
+                            </CardContent>
+                        </Card>
+                    </LogBox>
+                    }
                 </ContentsContainer>
             </Container>
         </>
