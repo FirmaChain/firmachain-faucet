@@ -1,9 +1,10 @@
+import ReCAPTCHA from 'react-google-recaptcha';
 import { Paper, InputBase, Divider, IconButton, Typography, Card, CardContent } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, MainTitle, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
+import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, ReCaptchaBox, MainTitle, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
 import { Wallet } from '../utils/wallet';
 
@@ -112,6 +113,8 @@ const useStyles = makeStyles((theme) => ({
 export default function Main() {
     const [sendingState, setSendingState] = useState(false);
 
+    const [openRecaptcha, setOpenRecaptcha] = useState(false);
+
     const [resultLog, setResultLog] = useState(null)
 
     const classes = useStyles();
@@ -128,6 +131,10 @@ export default function Main() {
     const moveToExplorerTransaction = (hash) => {
         window.open('https://explorer-devnet.firmachain.org/transactions/'+hash, '_blank')
     }
+    
+    const handleRecaptcha = (value) => {
+        {value && sendAddress()}
+    }
 
     const handleSendAddressInputText = (event) => {
         setSendAddressInput(event.target.value);
@@ -141,7 +148,7 @@ export default function Main() {
         if(sendAddressInput === ''){
             return;
         }
-        sendAddress();
+        setOpenRecaptcha(true);
     }
 
     const sendAddress = async() => {
@@ -164,9 +171,11 @@ export default function Main() {
             })
 
             resetSendAddressInputText();
+            setOpenRecaptcha(false);
             setSendingState(false);
         } catch (error) {
             console.log("[error] " + error);
+            setOpenRecaptcha(false);
             setSendingState(false);
         }
     }
@@ -216,6 +225,17 @@ export default function Main() {
                             </Paper>
                         </Wrapper>
                     </MainBox>
+
+                    {openRecaptcha &&
+                        <ReCaptchaBox>
+                            <ReCAPTCHA 
+                                style={{ display: "inline-block", height: '35px'}}
+                                theme="light"
+                                sitekey='6LdSn0ocAAAAABEVdMZQJPk8wHPL4yGg6AHzfDh-' 
+                                onChange={handleRecaptcha}
+                            />
+                        </ReCaptchaBox>
+                    }
 
                     {resultLog &&
                     <LogBox>
