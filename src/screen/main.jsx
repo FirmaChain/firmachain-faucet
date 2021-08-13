@@ -1,5 +1,5 @@
 import ReCAPTCHA from 'react-google-recaptcha';
-import { Paper, InputBase, Divider, IconButton, Typography, Card, CardContent } from '@material-ui/core'
+import { Paper, InputBase, Divider, IconButton, Button, Select, MenuItem, Typography, Card, CardContent } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send';
 import { useState } from 'react';
 import styled from 'styled-components';
@@ -120,9 +120,12 @@ export default function Main() {
     const classes = useStyles();
     const [sendAddressInput, setSendAddressInput] = useState('');
 
+    const [network, setNetwork] = useState('imperium');
+    const networkData = ['imperium', 'colosseum'];
+
     const { 
-        sendTokenFromFaucet,
-     } = Wallet();
+        changeChainTxAddress,
+        sendTokenFromFaucet, } = Wallet();
 
     const moveToExplorer = () => {
         window.open('https://explorer-devnet.firmachain.org/', '_blank')
@@ -144,6 +147,18 @@ export default function Main() {
         setSendAddressInput('');
     }
     
+    const handleNetwork = (event) => {
+        setNetwork(event.target.value);
+        switch (event.target.value) {
+            case 'imperium':
+                return changeChainTxAddress('https://imperium-node1.firmachain.org:26657');
+            case 'colosseum':
+                return changeChainTxAddress('https://colosseum-node1.firmachain.org:26657');
+            default:
+                break;
+        }
+    }
+
     const activateSendProcess = () => {
         if(sendAddressInput === ''){
             return;
@@ -197,6 +212,18 @@ export default function Main() {
                             src="/assets/firma_chain_title.svg"
                             onClick={() => moveToExplorer()}
                         />
+                        <Select
+                            className={classes.network_select}
+                            value={network}
+                            onChange={(e)=>handleNetwork(e)}
+                            MenuProps={{ disablePortal: true }}
+                        >
+                            {networkData.map((network) => {
+                                return (
+                                    <MenuItem value={network} key={'select-option-'+network}>{network}</MenuItem>
+                                )
+                            })}
+                        </Select>
                     </HeaderBox>
 
                     <MainBox>
