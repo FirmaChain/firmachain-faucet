@@ -1,12 +1,16 @@
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Paper, InputBase, Divider, IconButton, Button, Select, MenuItem, Typography, Card, CardContent } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
-import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, ReCaptchaBox, MainTitle, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
+import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
+
+import WalletDrawer from '../components/wallet_drawer';
 
 import { Wallet } from '../utils/wallet';
+
+export const UtilsContext = React.createContext();
 
 const Video_Background = styled.video`
     width: 100%;
@@ -122,6 +126,8 @@ export default function Main() {
 
     const [network, setNetwork] = useState('imperium');
     const networkData = ['imperium', 'colosseum'];
+    
+    const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
 
     const { 
         changeChainTxAddress,
@@ -194,6 +200,10 @@ export default function Main() {
             setSendingState(false);
         }
     }
+    
+    const handleWalletDrawer = (open) => {
+        setOpenWalletDrawer(open);
+    }
 
     return (
         <>
@@ -251,6 +261,17 @@ export default function Main() {
                                 </IconButton>
                             </Paper>
                         </Wrapper>
+                        <MainButtonBox>
+                        <MainButtonWrapper>
+                            <Button
+                                className={classes.main_button}
+                                variant="contained"
+                                onClick={()=>setOpenWalletDrawer(true)}
+                            >
+                                wallet
+                            </Button>
+                        </MainButtonWrapper>
+                    </MainButtonBox>
                     </MainBox>
 
                     {openRecaptcha &&
@@ -314,6 +335,9 @@ export default function Main() {
                     }
                 </ContentsContainer>
             </Container>
+
+            {/* Drawer */}
+            <WalletDrawer open={openWalletDrawer} handleWalletDrawer={handleWalletDrawer}/>
         </>
     );
 }
