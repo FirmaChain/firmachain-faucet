@@ -14,6 +14,9 @@ import { useEffect } from "react"
 
 import { Wallet } from "../utils/wallet"
 
+import { useSelector } from 'react-redux';
+import { WalletInfoActions } from "../redux/actions"
+
 const useStyles = makeStyles((theme) => ({
     divider: {
         backgroundColor: '#fff',
@@ -63,10 +66,13 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         getAddressFromPrivateKey,
     } = Wallet();
     
-    const [nemonic, setNemonic] = useState('');
-    const [privateKey, setPrivateKey] = useState('');
-    const [address, setAddress] = useState('');
-    const [accountIndex, setAccountIndex] = useState('');
+    const state = useSelector(state => state.walletInfo);
+    
+    const [nemonic, setNemonic] = useState(state.nemonic);
+    const [privateKey, setPrivateKey] = useState(state.privateKey);
+    const [address, setAddress] = useState(state.walletAddress);
+    const [accountIndex, setAccountIndex] = useState(state.accountIndex);
+    const [balance, setBalance] = useState(state.fctBalance);
 
     const [isCreate, setIsCreate] = useState(false);
 
@@ -119,11 +125,23 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         }
     }
 
+    const saveWalletInfoToRedux = () => {
+        WalletInfoActions.setNemonic(nemonic);
+        WalletInfoActions.setPrivateKey(privateKey);
+        WalletInfoActions.setWalletAddress(address);
+        WalletInfoActions.setAccountIndex(accountIndex);
+        WalletInfoActions.setFctBalance(balance);
+    }
+
+    useEffect(() => {
+        saveWalletInfoToRedux();
+    }, [nemonic, privateKey, address, accountIndex, balance])
+
     useEffect(() => {
         if(isCreate){
             createWallet();        
         } else {
-            if(nemonic !== ''){
+            if(state.nemonic !== ''){
                 getWalletData(Number(accountIndex));
             }
         }
@@ -133,10 +151,11 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }, [isCreate, accountIndex])
 
     useEffect(() => {
-        setNemonic('');
-        setPrivateKey('');
-        setAddress('');
-        setAccountIndex('');
+        setNemonic(state.nemonic);
+        setPrivateKey(state.privateKey);
+        setAddress(state.walletAddress);
+        setBalance(state.fctBalance);
+        setAccountIndex(state.accountIndex);
     }, [open])
 
     return (

@@ -1,7 +1,7 @@
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Paper, InputBase, Divider, IconButton, Button, Select, MenuItem, Typography, Card, CardContent } from '@material-ui/core'
 import SendIcon from '@material-ui/icons/Send';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
@@ -9,6 +9,8 @@ import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, M
 import WalletDrawer from '../components/wallet_drawer';
 
 import { Wallet } from '../utils/wallet';
+
+import { useSelector } from 'react-redux';
 
 export const UtilsContext = React.createContext();
 
@@ -115,6 +117,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
+    const state = useSelector(state => state.walletInfo);
+
     const [sendingState, setSendingState] = useState(false);
 
     const [openRecaptcha, setOpenRecaptcha] = useState(false);
@@ -204,6 +208,12 @@ export default function Main() {
     const handleWalletDrawer = (open) => {
         setOpenWalletDrawer(open);
     }
+    
+    useEffect(() => {
+        if(resultLog){
+            setResultLog(null);
+        }
+    }, [state.nemonic, state.privateKey, state.walletAddress])
 
     return (
         <>
