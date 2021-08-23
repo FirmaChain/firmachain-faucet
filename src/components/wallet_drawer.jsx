@@ -64,6 +64,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         createNewWallet,
         getPrivateKey,
         getAddressFromPrivateKey,
+        getTokenBalance,
     } = Wallet();
     
     const state = useSelector(state => state.walletInfo);
@@ -104,6 +105,8 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             setPrivateKey(_privateKey);
             let _adrFromPrivateKey = await getAddressFromPrivateKey(_privateKey);
             setAddress(_adrFromPrivateKey);
+            let _balance = await getTokenBalance(_adrFromPrivateKey);
+            setBalance(_balance);
         } catch (error) {
             console.log("[error] " + error);
         }
@@ -120,6 +123,9 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             }
             let _adrFromPrivateKey = await getAddressFromPrivateKey(_privateKey);
             setAddress(_adrFromPrivateKey);
+            
+            let _balance = await getTokenBalance(_adrFromPrivateKey);
+            setBalance(_balance);
         } catch (error) {
             console.log("[error] " + error);
         }
@@ -264,6 +270,24 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             </ListItem>
                             </>
                         }
+                        
+                        <Divider className={classes.divider}/>
+                        <Typography
+                            className={classes.typography_text}
+                            variant='body2'
+                        >
+                            FCT Balance
+                        </Typography>
+                        <ListItem>
+                            <Wrapper drawer>
+                                <TextField 
+                                    className={classes.disabled_textfield}
+                                    variant="outlined"
+                                    disabled
+                                    value={balance+'fct'}
+                                />
+                            </Wrapper>
+                        </ListItem>
                     </List>
                 </div>
             </ClickAwayListener>

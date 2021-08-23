@@ -6,6 +6,8 @@ import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
+import { WalletInfoActions } from '../redux/actions';
+
 import WalletDrawer from '../components/wallet_drawer';
 
 import { Wallet } from '../utils/wallet';
@@ -135,7 +137,8 @@ export default function Main() {
 
     const { 
         changeChainTxAddress,
-        sendTokenFromFaucet, } = Wallet();
+        sendTokenFromFaucet,
+        getTokenBalance,  } = Wallet();
 
     const moveToExplorer = () => {
         window.open('https://explorer-devnet.firmachain.org/', '_blank')
@@ -195,6 +198,9 @@ export default function Main() {
                 rawLog: result.rawLog
             })
 
+            let balance = await getTokenBalance(sendAddressInput);
+            WalletInfoActions.setFctBalance(balance);
+            
             resetSendAddressInputText();
             setOpenRecaptcha(false);
             setSendingState(false);
