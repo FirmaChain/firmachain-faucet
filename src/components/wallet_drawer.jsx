@@ -6,6 +6,7 @@ import { Divider } from "@material-ui/core"
 import { Drawer } from "@material-ui/core"
 import { makeStyles } from '@material-ui/core/styles';
 import CloseIcon from '@material-ui/icons/Close'
+import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
@@ -177,6 +178,10 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             >
                                 {DrawerTitle}
                             </Typography>
+                            <RefreshIcon 
+                                style={{color: '#fff', cursor: 'pointer'}}
+                                onClick={()=>getWalletData()}
+                            />
                         </Wrapper>
                         <CloseIcon 
                             style={{color: '#fff', cursor: 'pointer'}}
