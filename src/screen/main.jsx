@@ -9,6 +9,7 @@ import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, M
 import { WalletInfoActions } from '../redux/actions';
 
 import WalletDrawer from '../components/wallet_drawer';
+import RecoverDrawer from '../components/recover_drawer';
 
 import { Wallet } from '../utils/wallet';
 
@@ -134,6 +135,7 @@ export default function Main() {
     const networkData = ['imperium', 'colosseum'];
     
     const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
+    const [openRecoverDrawer, setOpenRecoverDrawer] = useState(false);
 
     const { 
         changeChainTxAddress,
@@ -215,6 +217,10 @@ export default function Main() {
         setOpenWalletDrawer(open);
     }
     
+    const handleRecoverDrawer = (open) => {
+        setOpenRecoverDrawer(open);
+    }
+    
     useEffect(() => {
         if(resultLog){
             setResultLog(null);
@@ -286,6 +292,13 @@ export default function Main() {
                             >
                                 wallet
                             </Button>
+                            <Button
+                                className={classes.main_button}
+                                variant="contained"
+                                onClick={()=>setOpenRecoverDrawer(true)}
+                            >
+                                Recover
+                            </Button>
                         </MainButtonWrapper>
                     </MainButtonBox>
                     </MainBox>
@@ -354,6 +367,7 @@ export default function Main() {
 
             {/* Drawer */}
             <WalletDrawer open={openWalletDrawer} handleWalletDrawer={handleWalletDrawer}/>
+            <RecoverDrawer open={openRecoverDrawer} handleRecoverDrawer={handleRecoverDrawer} handleWalletDrawer={handleWalletDrawer}/>
         </>
     );
 }
