@@ -59,6 +59,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
     } = Wallet();
     
     const [nemonic, setNemonic] = useState('');
+    const [privateKey, setPrivateKey] =  useState('');
 
     const [recovery, setRecovery] = useState(false);
 
@@ -74,17 +75,27 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
         setNemonic(event.target.value);
     }
 
+    const onChangePrivateKeyInput = (event) => {
+        setPrivateKey(event.target.value)
+    }
+
     const recoverWallet = async() => {
-        if(nemonic === ''){
+        if(nemonic === '' && privateKey === ''){
             return;
         } else {
             try{
-                let _privateKey;
+                let _privateKey = privateKey;
                 let _walletAdr;
                 let _balance;
 
-                WalletInfoActions.setNemonic(nemonic);
-                _privateKey = await getPrivateKey(nemonic, 0);
+                if(nemonic !== ''){
+                    WalletInfoActions.setNemonic(nemonic);
+                    _privateKey = await getPrivateKey(nemonic, 0);
+                    setPrivateKey(_privateKey);
+                } else {
+                    setNemonic('');
+                    WalletInfoActions.setNemonic('');
+                }
                 WalletInfoActions.setPrivateKey(_privateKey);
 
                 _walletAdr = await getAddressFromPrivateKey(_privateKey);
@@ -114,6 +125,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
 
     useEffect(() => {
         setNemonic('');
+        setPrivateKey('');
     }, [open])
 
     return (
@@ -150,7 +162,21 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
                                 value={nemonic}
                             />
                         </ListItem>
-                        
+
+                        <Typography
+                            className={classes.typography_text}
+                            variant='body2'
+                        >
+                            Private Key
+                        </Typography>
+                        <ListItem>
+                            <TextField
+                                className={classes.disabled_textfield}
+                                variant="outlined"
+                                onChange={onChangePrivateKeyInput}
+                                value={privateKey}
+                            />
+                        </ListItem>
                         <Wrapper>
                             <Button
                                 className={classes.button}
