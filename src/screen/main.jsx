@@ -10,6 +10,7 @@ import { WalletInfoActions } from '../redux/actions';
 
 import WalletDrawer from '../components/wallet_drawer';
 import RecoverDrawer from '../components/recover_drawer';
+import NftDrawer from '../components/nft_drawer';
 
 import { Wallet } from '../utils/wallet';
 
@@ -136,6 +137,7 @@ export default function Main() {
     
     const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
     const [openRecoverDrawer, setOpenRecoverDrawer] = useState(false);
+    const [openNftDrawer, setOpenNftDrawer] = useState(false);
 
     const { 
         changeChainTxAddress,
@@ -221,6 +223,10 @@ export default function Main() {
         setOpenRecoverDrawer(open);
     }
     
+    const handleNftDrawer = (open) => {
+        setOpenNftDrawer(open);
+    }
+    
     useEffect(() => {
         if(resultLog){
             setResultLog(null);
@@ -299,6 +305,13 @@ export default function Main() {
                             >
                                 Recover
                             </Button>
+                            <Button
+                                className={classes.main_button}
+                                variant="contained"
+                                onClick={()=>setOpenNftDrawer(true)}
+                            >
+                                NFT
+                            </Button>
                         </MainButtonWrapper>
                     </MainButtonBox>
                     </MainBox>
@@ -368,6 +381,7 @@ export default function Main() {
             {/* Drawer */}
             <WalletDrawer open={openWalletDrawer} handleWalletDrawer={handleWalletDrawer}/>
             <RecoverDrawer open={openRecoverDrawer} handleRecoverDrawer={handleRecoverDrawer} handleWalletDrawer={handleWalletDrawer}/>
+            <NftDrawer open={openNftDrawer} handleNftDrawer={handleNftDrawer}/>
         </>
     );
 }
