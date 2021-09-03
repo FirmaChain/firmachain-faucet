@@ -9,14 +9,14 @@ import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
-import React, { useContext, useState } from "react"
+import React, { useState } from "react"
 import { useEffect } from "react"
 
 import { useSelector } from "react-redux"
 import { Wallet } from "../utils/wallet"
+import CreateNFTSection from "./nft/createNftSection"
 
 import { WalletInfoActions } from "../redux/actions"
-import { UtilsContext } from "../screen/main"
 
 export const TapNFTContext = React.createContext();
 
@@ -83,16 +83,37 @@ export default function NftDrawer({open, handleNftDrawer}) {
     const state = useSelector(state => state.walletInfo);
 
     const [myNFT, setMyNFT] = useState('');
+    
+    // Drawer section open 관련 변수
+    const [openListNFT, setOpenListNFT] = useState(false);
+    const [openCreateNFT, setOpenCreateNFT] = useState(false);
 
     const { 
         getTokenBalance,
         getAllNFT,
         getNFTBalanceAll, } = Wallet();
 
+        
+    const handleNFTButtons = (target) => {
+        setOpenCreateNFT(target === 'create');
+        setOpenListNFT(target === 'list');
+    }
+    
     const closeDrawer = () => {
         handleNftDrawer(false)
     };
 
+    const getAllNFTInfo = async() => {
+        try {
+            let nftItemList = await getAllNFT(state.walletAddress);
+            setMyNFT(nftItemList)
+
+            getBalance();
+        } catch(error) {
+            console.log("[error] " + error);
+        }
+    }
+    
     const getBalance = async() => {
         try {
             let _balance = await getTokenBalance(state.walletAddress);
@@ -101,6 +122,17 @@ export default function NftDrawer({open, handleNftDrawer}) {
             console.log("[error] " + error);
         }
     }
+    
+    useEffect(() => {
+        getAllNFTInfo();
+    }, [openListNFT])
+
+    useEffect(() => {
+        setOpenCreateNFT(false);
+        setOpenListNFT(false);
+
+        getAllNFTInfo();
+    }, [open])
 
     return (
         <Drawer anchor={'right'} open={open}>
@@ -158,6 +190,29 @@ export default function NftDrawer({open, handleNftDrawer}) {
                                 />
                             </Wrapper>
                         </ListItem>
+                        <Divider className={classes.divider}/>
+                        <Wrapper style={{display: myNFT.length > 0 &&'flex'}}>
+                            <Button 
+                                className={classes.button}
+                                variant="contained"
+                                onClick={()=>handleNFTButtons('create')}
+                            >Create</Button>
+                            {myNFT.length > 0 &&
+                                <Button 
+                                    className={classes.button}
+                                    variant="contained"
+                                    onClick={()=>handleNFTButtons('list')}
+                                >List</Button>
+                            }
+                            
+                        </Wrapper>
+                        
+                        <TapNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
+                            {/* CREATE SECTION */}
+                            {openCreateNFT &&
+                            <CreateNFTSection open={openCreateNFT}/>
+                            }
+                        </TapNFTContext.Provider>
                     </List>
                 </div>
             </ClickAwayListener>
