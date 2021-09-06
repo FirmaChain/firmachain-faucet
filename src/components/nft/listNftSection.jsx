@@ -6,6 +6,7 @@ import { Wrapper } from "../../utils/public_style"
 
 import { useState } from "react"
 import { useEffect } from "react"
+import SendNFTSection from "./sendNftSection";
 
 const useStyles = makeStyles((theme) => ({
     typography_title: {
@@ -50,6 +51,7 @@ export default function ListNftSection({open, nfts}) {
                 index: idx,
                 id: nft.id,
                 json: jsonData,
+                open: false,
             }])
         })
     }
@@ -123,6 +125,12 @@ export default function ListNftSection({open, nfts}) {
                     </Wrapper>
 
                 </ListItem>
+                {nft.open &&
+                    <>
+                    <SendNFTSection id={nft.id}/>
+                    <Divider className={classes.divider}/>
+                    </>
+                }
                 </>
             )
         })}      
