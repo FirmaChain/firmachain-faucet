@@ -14,6 +14,7 @@ import { useEffect } from "react"
 
 import { useSelector } from "react-redux"
 import { Wallet } from "../utils/wallet"
+import ListNFTSection from "./nft/listNftSection"
 import CreateNFTSection from "./nft/createNftSection"
 
 import { WalletInfoActions } from "../redux/actions"
@@ -211,6 +212,11 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             {/* CREATE SECTION */}
                             {openCreateNFT &&
                             <CreateNFTSection open={openCreateNFT}/>
+                            }
+                            
+                            {/* LIST SECTION */}
+                            {openListNFT && 
+                            <ListNFTSection open={openListNFT} nfts={myNFT}/>
                             }
                         </TapNFTContext.Provider>
                     </List>
