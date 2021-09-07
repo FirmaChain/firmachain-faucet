@@ -81,11 +81,13 @@ export default function SendNFTSection({id}) {
     const [toAddressInputText, settoAddressInputText] = useState('');
     
     const [isTransferNFT, setIsTransferNFT] = useState(false);
+    const [isBurnNFT, setIsBurnNFT] = useState(false);
 
     const NftIdIndex = id;
     
     const { 
         TransferNFT,
+        BurnNFT, 
         getTokenBalance, } = Wallet();
     
     const onChangetoAddressInputTextess = (event) => {
@@ -105,11 +107,30 @@ export default function SendNFTSection({id}) {
         }
     }
     
+    const burnNFTToken = async() => {
+        try {
+            let burn = await BurnNFT(state.privateKey, Number(NftIdIndex))
+            
+            let balance = await getTokenBalance(state.walletAddress);
+            WalletInfoActions.setFctBalance(balance);
+
+            getAllNFTInfo();
+            setIsBurnNFT(false);
+        } catch (error) {
+            console.log("[error] " + error);
+            setIsBurnNFT(false);
+        }
+    }
+
     useEffect(() => {
         if(isTransferNFT){
             transferNFTToken();
         }
-    }, [isTransferNFT])
+
+        if(isBurnNFT){
+            burnNFTToken();
+        }
+    }, [isTransferNFT, isBurnNFT])
 
     return (
         <>
@@ -131,9 +152,18 @@ export default function SendNFTSection({id}) {
             <Button 
                 className={classes.button}
                 variant="contained"
-                disabled={isTransferNFT}
+                disabled={isTransferNFT || isBurnNFT}
                 onClick={()=>setIsTransferNFT(true)}
             >Send</Button>
+        </Wrapper>
+        
+        <Wrapper>
+            <Button 
+                className={classes.button}
+                variant="contained"
+                disabled={isTransferNFT || isBurnNFT}
+                onClick={()=>setIsBurnNFT(true)}
+            >Burn</Button>
         </Wrapper>
         </>
     )
