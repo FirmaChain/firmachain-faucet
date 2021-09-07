@@ -72,6 +72,8 @@ const useStyles = makeStyles((theme) => ({
 
 // export default function SendNFTSection({open, nfts, getAllNFTInfo}) {
 export default function SendNFTSection({id}) {
+    const { getAllNFTInfo } = useContext(TapNFTContext);
+
     const classes = useStyles();
 
     const state = useSelector(state => state.walletInfo);
@@ -96,6 +98,7 @@ export default function SendNFTSection({id}) {
             let balance = await getTokenBalance(state.walletAddress);
             WalletInfoActions.setFctBalance(balance);
 
+            getAllNFTInfo();
             setIsTransferNFT(false);
         } catch (error) {
             console.log("[error] " + error);
