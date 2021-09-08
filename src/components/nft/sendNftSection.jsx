@@ -12,6 +12,7 @@ import { WalletInfoActions } from "../../redux/actions"
 import { useSelector } from "react-redux"
 
 import { Wallet } from "../../utils/wallet"
+import { UtilsContext } from "../../screen/main";
 import { TapNFTContext } from "../nft_drawer";
 
 const useStyles = makeStyles((theme) => ({

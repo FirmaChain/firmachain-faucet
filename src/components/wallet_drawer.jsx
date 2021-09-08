@@ -10,13 +10,15 @@ import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useEffect } from "react"
 
 import { Wallet } from "../utils/wallet"
 
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions"
+
+import copy from "copy-to-clipboard"
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -88,6 +90,13 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const onChangeAccountIndex = (event) => {
         setAccountIndex(event.target.value);
     }
+
+    const handleClipboard = (event, label) => {
+        if(event.target.value === '' || event.target.value === undefined){
+            return;
+        }
+        copy(event.target.value);
+    };
 
     const onClickCreateWallet = () => {
         setIsCreate(true);
@@ -208,6 +217,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             <Wrapper drawer>
                                 <TextField 
                                     className={classes.disabled_textfield}
+                                    onClick={(e)=>handleClipboard(e, 'Nemonic')}
                                     multiline
                                     maxRows={5}
                                     variant="outlined"
@@ -226,6 +236,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             <Wrapper drawer>
                                 <TextField
                                     className={classes.disabled_textfield}
+                                    onClick={(e)=>handleClipboard(e, 'Private Key')}
                                     variant="outlined"
                                     value={privateKey}
                                     disabled
@@ -242,6 +253,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                         <ListItem>
                             <TextField
                                 className={classes.disabled_textfield}
+                                onClick={(e)=>handleClipboard(e, 'Wallet Address')}
                                 variant="outlined"
                                 value={address}
                                 disabled

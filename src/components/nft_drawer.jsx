@@ -17,6 +17,7 @@ import { Wallet } from "../utils/wallet"
 import ListNFTSection from "./nft/listNftSection"
 import CreateNFTSection from "./nft/createNftSection"
 
+import copy from "copy-to-clipboard"
 import { WalletInfoActions } from "../redux/actions"
 
 export const TapNFTContext = React.createContext();
@@ -94,6 +95,12 @@ export default function NftDrawer({open, handleNftDrawer}) {
         getAllNFT,
         getNFTBalanceAll, } = Wallet();
 
+    const handleClipboard = (event, label) => {
+        if(event.target.value === '' || event.target.value === undefined){
+            return;
+        }
+        copy(event.target.value);
+    };
         
     const handleNFTButtons = (target) => {
         setOpenCreateNFT(target === 'create');
@@ -170,6 +177,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                         <ListItem>
                             <TextField
                                 className={classes.disabled_textfield}
+                                onClick={(e)=>handleClipboard(e, 'Wallet Address')}
                                 variant="outlined"
                                 value={state.walletAddress}
                                 disabled
