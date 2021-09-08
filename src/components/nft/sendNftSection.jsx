@@ -13,7 +13,7 @@ import { useSelector } from "react-redux"
 
 import { Wallet } from "../../utils/wallet"
 import { UtilsContext } from "../../screen/main";
-import { TapNFTContext } from "../nft_drawer";
+import { TabNFTContext } from "../nft_drawer";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -73,10 +73,11 @@ const useStyles = makeStyles((theme) => ({
 
 // export default function SendNFTSection({open, nfts, getAllNFTInfo}) {
 export default function SendNFTSection({id}) {
-    const { getAllNFTInfo } = useContext(TapNFTContext);
+    const { getAllNFTInfo } = useContext(TabNFTContext);
 
     const { 
         handleAlertOpen,
+        handleLoadingOpen,
     } = useContext(UtilsContext);
 
     const classes = useStyles();
@@ -100,6 +101,7 @@ export default function SendNFTSection({id}) {
     }
     
     const transferNFTToken = async() => {
+        handleLoadingOpen(true);
         try {
             let transfer = await TransferNFT(state.privateKey, toAddressInputText, Number(NftIdIndex))
             let balance = await getTokenBalance(state.walletAddress);
@@ -107,14 +109,17 @@ export default function SendNFTSection({id}) {
 
             getAllNFTInfo();
             setIsTransferNFT(false);
+            handleLoadingOpen(false);        
             handleAlertOpen('Transfer NFT Success', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
             handleAlertOpen(error.message, 5000, 'error');
+            handleLoadingOpen(false);
         }
     }
     
     const burnNFTToken = async() => {
+        handleLoadingOpen(true);
         try {
             let burn = await BurnNFT(state.privateKey, Number(NftIdIndex))
             
@@ -123,11 +128,13 @@ export default function SendNFTSection({id}) {
 
             getAllNFTInfo();
             setIsBurnNFT(false);
+            handleLoadingOpen(false);
             handleAlertOpen('Burned NFT', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
             handleAlertOpen(error.message, 3000, 'error');
             setIsBurnNFT(false);
+            handleLoadingOpen(false);
         }
     }
 

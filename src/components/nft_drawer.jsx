@@ -21,7 +21,7 @@ import copy from "copy-to-clipboard"
 import { WalletInfoActions } from "../redux/actions"
 import { UtilsContext } from "../screen/main"
 
-export const TapNFTContext = React.createContext();
+export const TabNFTContext = React.createContext();
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -223,7 +223,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             
                         </Wrapper>
                         
-                        <TapNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
+                        <TabNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
                             {/* CREATE SECTION */}
                             {openCreateNFT &&
                             <CreateNFTSection open={openCreateNFT}/>
@@ -233,7 +233,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             {openListNFT && 
                             <ListNFTSection open={openListNFT} nfts={myNFT}/>
                             }
-                        </TapNFTContext.Provider>
+                        </TabNFTContext.Provider>
                     </List>
                 </div>
             </ClickAwayListener>

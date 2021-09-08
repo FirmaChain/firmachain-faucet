@@ -13,6 +13,7 @@ import RecoverDrawer from '../components/recover_drawer';
 import NftDrawer from '../components/nft_drawer';
 
 import { Wallet } from '../utils/wallet';
+import { LoadingProgress } from '../components/loading/loading_progress';
 
 import { Alert } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
@@ -437,6 +438,9 @@ export default function Main() {
                 {alertMessage}
             </Alert>
         </Snackbar>        
+
+        {/* Loading */}
+        <LoadingProgress open={isLoading}/>
         </UtilsContext.Provider>
         </>
     )

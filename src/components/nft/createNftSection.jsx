@@ -13,7 +13,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux"
 import { Wallet } from "../../utils/wallet"
 import { UtilsContext } from "../../screen/main";
-import { TapNFTContext } from "../nft_drawer";
+import { TabNFTContext } from "../nft_drawer";
 
 const IPFS = require('../../utils/ipfs_api');
 
@@ -74,10 +74,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CreateNFTSection(open) {
-    const { handleNFTButtons } = useContext(TapNFTContext);
+    const { handleNFTButtons } = useContext(TabNFTContext);
 
     const {
         handleAlertOpen, 
+        handleLoadingOpen,
      } = useContext(UtilsContext);
 
     let FirmaIPFSRead = new IPFS();
@@ -128,6 +129,8 @@ export default function CreateNFTSection(open) {
     const mintNFT = async() => {
         if(nftFile === null || nftName === '' || nftDesc === '') return;
 
+        handleLoadingOpen(true);
+
         try {
             let fileHash = await FirmaIPFSWrite.addFile(nftFile);
             let fileUrl = FirmaIPFSRead.getURLFromHash(fileHash);
@@ -141,10 +144,12 @@ export default function CreateNFTSection(open) {
 
             handleNFTButtons('list');
             handleAlertOpen('Created new NFT', 3000, 'success');
+            handleLoadingOpen(false);
             setIsMintNFT(false);
         } catch(error) {
             console.log(error);
             handleAlertOpen(error.message, 5000, 'error');
+            handleLoadingOpen(false);
             setIsMintNFT(false);
         }
     }
