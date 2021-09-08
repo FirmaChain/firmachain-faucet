@@ -9,7 +9,7 @@ import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { useEffect } from "react"
 
 import { useSelector } from "react-redux"
@@ -19,6 +19,7 @@ import CreateNFTSection from "./nft/createNftSection"
 
 import copy from "copy-to-clipboard"
 import { WalletInfoActions } from "../redux/actions"
+import { UtilsContext } from "../screen/main"
 
 export const TapNFTContext = React.createContext();
 
@@ -79,13 +80,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function NftDrawer({open, handleNftDrawer}) {
+    const { handleAlertOpen, handleLoadingOpen } = useContext(UtilsContext);
+
     const classes = useStyles();
     const DrawerTitle = 'NFT';
 
     const state = useSelector(state => state.walletInfo);
 
     const [myNFT, setMyNFT] = useState('');
-    
+
     // Drawer section open 관련 변수
     const [openListNFT, setOpenListNFT] = useState(false);
     const [openCreateNFT, setOpenCreateNFT] = useState(false);
@@ -100,28 +103,32 @@ export default function NftDrawer({open, handleNftDrawer}) {
             return;
         }
         copy(event.target.value);
+        handleAlertOpen('Coppied ' + label, 3000, 'success');
     };
-        
+
     const handleNFTButtons = (target) => {
         setOpenCreateNFT(target === 'create');
         setOpenListNFT(target === 'list');
     }
-    
+
     const closeDrawer = () => {
         handleNftDrawer(false)
     };
 
     const getAllNFTInfo = async() => {
+        handleLoadingOpen(true);
         try {
             let nftItemList = await getAllNFT(state.walletAddress);
             setMyNFT(nftItemList)
 
             getBalance();
+            handleLoadingOpen(false);
         } catch(error) {
             console.log("[error] " + error);
+            handleLoadingOpen(false);
         }
     }
-    
+
     const getBalance = async() => {
         try {
             let _balance = await getTokenBalance(state.walletAddress);
@@ -130,7 +137,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
             console.log("[error] " + error);
         }
     }
-    
+
     useEffect(() => {
         getAllNFTInfo();
     }, [openListNFT])
@@ -221,7 +228,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             {openCreateNFT &&
                             <CreateNFTSection open={openCreateNFT}/>
                             }
-                            
+
                             {/* LIST SECTION */}
                             {openListNFT && 
                             <ListNFTSection open={openListNFT} nfts={myNFT}/>

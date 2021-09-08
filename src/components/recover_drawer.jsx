@@ -8,12 +8,13 @@ import CloseIcon from '@material-ui/icons/Close'
 
 import { Wrapper } from "../utils/public_style"
 
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useEffect } from "react"
 
 import { Wallet } from "../utils/wallet"
 import { WalletInfoActions } from "../redux/actions"
 import { useSelector } from "react-redux"
+import { UtilsContext } from "../screen/main"
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -49,8 +50,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDrawer}) {
+    const { handleAlertOpen } = useContext(UtilsContext);
+
     const classes = useStyles();
     const DrawerTitle = 'Recover';
+
+    const state = useSelector(state => state.walletInfo);
 
     const {
         getPrivateKey,
@@ -81,6 +86,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
 
     const recoverWallet = async() => {
         if(nemonic === '' && privateKey === ''){
+            handleAlertOpen('Please fill in Nemonic or Privete key', 5000, 'error');
             return;
         } else {
             try{
@@ -106,10 +112,12 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
 
                 WalletInfoActions.setWalletExist(true);
 
+                handleAlertOpen('Recovered your wallet', 3000, 'success');
                 closeDrawer();
                 openWalletDrawer();
             } catch(error) {
                 console.log("[error] " + error);
+                handleAlertOpen(error.message, 3000, 'error');
             }
         }
     }

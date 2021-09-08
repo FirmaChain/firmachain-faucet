@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions"
 
 import copy from "copy-to-clipboard"
+import { UtilsContext } from "../screen/main"
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -60,6 +61,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function WalletDrawer({open, handleWalletDrawer}) {
+    const { handleAlertOpen } = useContext(UtilsContext);
+
     const classes = useStyles();
     const DrawerTitle = 'Wallet';
 
@@ -71,7 +74,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     } = Wallet();
     
     const state = useSelector(state => state.walletInfo);
-    
+
     const [nemonic, setNemonic] = useState(state.nemonic);
     const [privateKey, setPrivateKey] = useState(state.privateKey);
     const [address, setAddress] = useState(state.walletAddress);
@@ -96,6 +99,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             return;
         }
         copy(event.target.value);
+        handleAlertOpen('Coppied ' + label, 3000, 'success');
     };
 
     const onClickCreateWallet = () => {
@@ -117,8 +121,11 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             setAddress(_adrFromPrivateKey);
             let _balance = await getTokenBalance(_adrFromPrivateKey);
             setBalance(_balance);
+
+            handleAlertOpen('Created your wallet', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
+            handleAlertOpen(error.message, 5000, 'error');
         }
     }
     
@@ -136,8 +143,10 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             
             let _balance = await getTokenBalance(_adrFromPrivateKey);
             setBalance(_balance);
+            
         } catch (error) {
             console.log("[error] " + error);
+            handleAlertOpen(error.message, 5000, 'error');
         }
     }
 
@@ -260,7 +269,8 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             />
                         </ListItem>
                         
-                        {nemonic !== '' && 
+                        
+                        {state.nemonic !== '' && 
                             <>
                             <ListItem>
                                 <Wrapper style={{display: 'flex', justifyContent: 'right'}}>
@@ -287,7 +297,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             </ListItem>
                             </>
                         }
-                        
+
                         <Divider className={classes.divider}/>
                         <Typography
                             className={classes.typography_text}

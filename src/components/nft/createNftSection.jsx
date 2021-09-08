@@ -76,6 +76,10 @@ const useStyles = makeStyles((theme) => ({
 export default function CreateNFTSection(open) {
     const { handleNFTButtons } = useContext(TapNFTContext);
 
+    const {
+        handleAlertOpen, 
+     } = useContext(UtilsContext);
+
     let FirmaIPFSRead = new IPFS();
     FirmaIPFSRead.setIPFSNode('https://ipfs-firma-devnet.firmachain.org');
     // FirmaIPFSRead.setIPFSNode('http://192.168.20.90:8080');
@@ -136,9 +140,11 @@ export default function CreateNFTSection(open) {
             let result = await MintNFT(state.privateKey, jsonUrl);
 
             handleNFTButtons('list');
+            handleAlertOpen('Created new NFT', 3000, 'success');
             setIsMintNFT(false);
         } catch(error) {
             console.log(error);
+            handleAlertOpen(error.message, 5000, 'error');
             setIsMintNFT(false);
         }
     }

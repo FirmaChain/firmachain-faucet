@@ -75,6 +75,10 @@ const useStyles = makeStyles((theme) => ({
 export default function SendNFTSection({id}) {
     const { getAllNFTInfo } = useContext(TapNFTContext);
 
+    const { 
+        handleAlertOpen,
+    } = useContext(UtilsContext);
+
     const classes = useStyles();
 
     const state = useSelector(state => state.walletInfo);
@@ -103,8 +107,10 @@ export default function SendNFTSection({id}) {
 
             getAllNFTInfo();
             setIsTransferNFT(false);
+            handleAlertOpen('Transfer NFT Success', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
+            handleAlertOpen(error.message, 5000, 'error');
         }
     }
     
@@ -117,8 +123,10 @@ export default function SendNFTSection({id}) {
 
             getAllNFTInfo();
             setIsBurnNFT(false);
+            handleAlertOpen('Burned NFT', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
+            handleAlertOpen(error.message, 3000, 'error');
             setIsBurnNFT(false);
         }
     }
