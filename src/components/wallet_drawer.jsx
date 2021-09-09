@@ -61,12 +61,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function WalletDrawer({open, handleWalletDrawer}) {
-    const { handleAlertOpen } = useContext(UtilsContext);
+    const { 
+        handleAlertOpen,
+        handleLoadingOpen } = useContext(UtilsContext);
 
     const classes = useStyles();
     const DrawerTitle = 'Wallet';
 
     const {
+        sendTokenByPrivateKey,
         createNewWallet,
         getPrivateKey,
         getAddressFromPrivateKey,
@@ -80,6 +83,10 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const [address, setAddress] = useState(state.walletAddress);
     const [accountIndex, setAccountIndex] = useState(state.accountIndex);
     const [balance, setBalance] = useState(state.fctBalance);
+    
+    const [toAddressInputText, settoAddressInputText] = useState('');
+    const [amountInputText, settoMountInputText] = useState('');
+    const [isSendToken, setIsSendToken] = useState(false);
 
     const [isCreate, setIsCreate] = useState(false);
 
@@ -92,6 +99,19 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     // Account Key index
     const onChangeAccountIndex = (event) => {
         setAccountIndex(event.target.value);
+    }
+    
+    const onChangetoAddressInputText = (event) => {
+        settoAddressInputText(event.target.value);
+    }
+
+    const onChangetoAmountInputText = (event) => {
+        settoMountInputText(event.target.value);
+    }
+
+    const resetToAddressAndAmount = () => {
+        settoAddressInputText('');
+        settoMountInputText('');
     }
 
     const handleClipboard = (event, label) => {
@@ -150,6 +170,32 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         }
     }
 
+    const sendToken = async() => {
+        if(toAddressInputText === '') {
+            handleAlertOpen('Please fill in to address', 5000, 'error');
+            return;
+        }
+        if(amountInputText === ''){
+            handleAlertOpen('Please fill in amount', 5000, 'error');
+            return;
+        }
+
+        handleLoadingOpen(true);
+        try {
+            let send = await sendTokenByPrivateKey(privateKey, toAddressInputText, Number(amountInputText));
+            console.log(send);
+            getWalletData();
+            handleLoadingOpen(false);
+            resetToAddressAndAmount();
+            handleAlertOpen('Send token success', 3000, 'success');
+        } catch (error) {
+            console.log("[error] " + error);
+            handleLoadingOpen(false);
+            resetToAddressAndAmount();
+            handleAlertOpen(error.message, 5000, 'error');
+        }
+    }
+
     const saveWalletInfoToRedux = () => {
         WalletInfoActions.setNemonic(nemonic);
         WalletInfoActions.setPrivateKey(privateKey);
@@ -157,6 +203,12 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         WalletInfoActions.setAccountIndex(accountIndex);
         WalletInfoActions.setFctBalance(balance);
     }
+
+    useEffect(() => {
+        if(isSendToken){
+            sendToken();
+        }
+    }, [isSendToken])
 
     useEffect(() => {
         saveWalletInfoToRedux();
@@ -315,6 +367,42 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                                 />
                             </Wrapper>
                         </ListItem>
+
+                        <Typography
+                            className={classes.typography_text}
+                            variant='body2'
+                        >
+                            To Address
+                        </Typography>
+                        <ListItem>
+                            <TextField
+                                className={classes.disabled_textfield}
+                                variant="outlined"
+                                onChange={onChangetoAddressInputText}
+                                value={toAddressInputText}
+                            />
+                        </ListItem>
+                        <Typography
+                            className={classes.typography_text}
+                            variant='body2'
+                        >
+                            Amount
+                        </Typography>
+                        <ListItem>
+                            <TextField
+                                className={classes.disabled_textfield}
+                                variant="outlined"
+                                onChange={onChangetoAmountInputText}
+                                value={amountInputText}
+                            />
+                        </ListItem>
+                        <Wrapper>
+                            <Button 
+                                className={classes.button}
+                                variant="contained"
+                                onClick={()=>setIsSendToken(true)}
+                            >Send</Button>
+                        </Wrapper>
                     </List>
                 </div>
             </ClickAwayListener>

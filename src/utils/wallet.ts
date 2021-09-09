@@ -7,6 +7,8 @@ import { stringToPath, Slip10, Slip10Curve, Bip39, EnglishMnemonic } from "@cosm
 import { txClient as BankTxClient, queryClient as BankQueryClient } from '../cosmos-sdk/cosmos.bank.v1beta1/module';
 import { BroadcastTxResponse } from "@cosmjs/stargate";
 
+import DATA from "../config";
+
 export function Wallet() {
     
     const firmaWalletOption = {
@@ -21,7 +23,7 @@ export function Wallet() {
     const [chainTxAddress, setChainTxAddress] = useState("https://imperium-node1.firmachain.org:26657");
 
     const tokenDenom = "ufct";
-    const faucetMnemonic = "domain come vicious leisure electric fringe boss all hundred gadget menu patrol category address visual elbow yard pudding manual history seminar birth album creek";
+    const faucetMnemonic = DATA.faucetMnemonic;
 
     function changeChainTxAddress(chainAdr: string) {
         // console.log("changed chain tx address ["+chainAdr+"]");
@@ -351,6 +353,7 @@ export function Wallet() {
     }
     
     return {
+        sendTokenByPrivateKey,
         changeChainTxAddress,
         createNewWallet,
         sendTokenFromFaucet,

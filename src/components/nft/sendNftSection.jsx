@@ -96,7 +96,7 @@ export default function SendNFTSection({id}) {
         BurnNFT, 
         getTokenBalance, } = Wallet();
     
-    const onChangetoAddressInputTextess = (event) => {
+    const onChangetoAddressInputText = (event) => {
         settoAddressInputText(event.target.value);
     }
     
@@ -160,7 +160,7 @@ export default function SendNFTSection({id}) {
             <TextField
                 className={classes.disabled_textfield}
                 variant="outlined"
-                onChange={onChangetoAddressInputTextess}
+                onChange={onChangetoAddressInputText}
                 value={toAddressInputText}
             />
         </ListItem>

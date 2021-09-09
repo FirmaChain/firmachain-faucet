@@ -91,7 +91,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
 
     // Drawer section open 관련 변수
     const [openListNFT, setOpenListNFT] = useState(false);
-    const [openCreateNFT, setOpenCreateNFT] = useState(false);
+    const [openCreateNFT, setOpenCreateNFT] = useState(true);
 
     const { 
         getTokenBalance,
@@ -144,7 +144,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
 
     useEffect(() => {
         setOpenCreateNFT(false);
-        setOpenListNFT(false);
+        setOpenListNFT(true);
 
         getAllNFTInfo();
     }, [open])
@@ -208,11 +208,6 @@ export default function NftDrawer({open, handleNftDrawer}) {
                         </ListItem>
                         <Divider className={classes.divider}/>
                         <Wrapper style={{display: myNFT.length > 0 &&'flex'}}>
-                            <Button 
-                                className={classes.button}
-                                variant="contained"
-                                onClick={()=>handleNFTButtons('create')}
-                            >Create</Button>
                             {myNFT.length > 0 &&
                                 <Button 
                                     className={classes.button}
@@ -220,18 +215,22 @@ export default function NftDrawer({open, handleNftDrawer}) {
                                     onClick={()=>handleNFTButtons('list')}
                                 >List</Button>
                             }
-                            
+                            <Button 
+                                className={classes.button}
+                                variant="contained"
+                                onClick={()=>handleNFTButtons('create')}
+                            >Create</Button>
                         </Wrapper>
                         
                         <TabNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
-                            {/* CREATE SECTION */}
-                            {openCreateNFT &&
-                            <CreateNFTSection open={openCreateNFT}/>
-                            }
-
                             {/* LIST SECTION */}
                             {openListNFT && 
                             <ListNFTSection open={openListNFT} nfts={myNFT}/>
+                            }
+
+                            {/* CREATE SECTION */}
+                            {openCreateNFT &&
+                            <CreateNFTSection open={openCreateNFT}/>
                             }
                         </TabNFTContext.Provider>
                     </List>
