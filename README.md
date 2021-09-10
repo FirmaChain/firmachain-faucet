@@ -50,7 +50,6 @@ export default DATA
 
 ### # Disable reCAPTCHA
 // line - 129
-// 삭제 또는 주석 처리
 const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
 
 // line - 218
@@ -74,7 +73,6 @@ const activateSendProcess = () => {
 }
 
 // line - 367
-// 삭제 또는 주석 처리
 {openRecaptcha &&
     <ReCaptchaBox>
         <ReCAPTCHA 
