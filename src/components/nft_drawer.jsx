@@ -87,10 +87,10 @@ export default function NftDrawer({open, handleNftDrawer}) {
 
     const state = useSelector(state => state.walletInfo);
 
-    const [myNFT, setMyNFT] = useState('');
+    const [myNFT, setMyNFT] = useState([]);
 
     // Drawer section open 관련 변수
-    const [openListNFT, setOpenListNFT] = useState(false);
+    const [openListNFT, setOpenListNFT] = useState(true);
     const [openCreateNFT, setOpenCreateNFT] = useState(true);
 
     const { 
@@ -143,10 +143,10 @@ export default function NftDrawer({open, handleNftDrawer}) {
     }, [openListNFT])
 
     useEffect(() => {
-        setOpenCreateNFT(false);
-        setOpenListNFT(true);
-
-        getAllNFTInfo();
+            setOpenCreateNFT(false);
+            setOpenListNFT(true);
+    
+            getAllNFTInfo();
     }, [open])
 
     return (
@@ -224,7 +224,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                         
                         <TabNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
                             {/* LIST SECTION */}
-                            {openListNFT && 
+                            {(openListNFT && myNFT.length > 0) && 
                             <ListNFTSection open={openListNFT} nfts={myNFT}/>
                             }
 

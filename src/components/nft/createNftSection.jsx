@@ -130,17 +130,18 @@ export default function CreateNFTSection(open) {
         if(nftFile === null || nftName === '' || nftDesc === '') return;
 
         handleLoadingOpen(true);
-
+        
         try {
             let fileHash = await FirmaIPFSWrite.addFile(nftFile);
             let fileUrl = FirmaIPFSRead.getURLFromHash(fileHash);
 
-            let Json = '{\"name\" : \"'+ nftName+'\", \"description\" : \"'+ nftDesc+'\", \"path\" : \"'+ fileUrl+'\"}';
+            let Json = '{\"name\" : \"'+ replaceTextData(nftName)+'\", \"description\" : \"'+ replaceTextData(nftDesc)+'\", \"path\" : \"'+ fileUrl+'\"}';
             let JsonHash = await FirmaIPFSWrite.addJson(Json);
 
             let jsonUrl = FirmaIPFSRead.getURLFromHash(JsonHash);
 
             let result = await MintNFT(state.privateKey, jsonUrl);
+            console.log(result);
 
             handleNFTButtons('list');
             handleAlertOpen('Created new NFT', 3000, 'success');
@@ -152,6 +153,12 @@ export default function CreateNFTSection(open) {
             handleLoadingOpen(false);
             setIsMintNFT(false);
         }
+    }
+
+    const replaceTextData = (text) => {
+        let inputText = text.replace("\n", '\\n');
+        console.log(inputText);
+        return inputText;
     }
 
     useEffect(() => {
