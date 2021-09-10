@@ -39,12 +39,8 @@ export default function ListNftSection({open, nfts}) {
     
     const fetchNFTJson = () => {
         if(myNFTJson.length > 0){ setMyNFTJson([]) };
-
-        console.log('ListNftSection');
-        console.log(nfts);
         
         nfts.map(async(nft, idx) => {
-            nft.tokenURI = nft.tokenURI.replace("https://ipfs-firma-devnet.firmachain.org/", "http://192.168.20.90:8080/");
             const response = await fetch(nft.tokenURI);
             const jsonData = await response.json();
 

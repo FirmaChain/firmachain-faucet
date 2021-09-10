@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, FooterBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
-import { WalletInfoActions } from '../redux/actions';
+import { OptionActions, WalletInfoActions } from '../redux/actions';
 
 import WalletDrawer from '../components/wallet_drawer';
 import RecoverDrawer from '../components/recover_drawer';
@@ -17,6 +17,8 @@ import { LoadingProgress } from '../components/loading/loading_progress';
 
 import { Alert } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
+
+import DATA from "../config";
 
 export const UtilsContext = React.createContext();
 
@@ -123,7 +125,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-    const state = useSelector(state => state.walletInfo);
+    const nftMode = DATA.NftMode;
+    const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
+
+    const walletState = useSelector(state => state.walletInfo);
+    const NftState = useSelector(state => state.option);
 
     const [openRecaptcha, setOpenRecaptcha] = useState(false);
 
@@ -191,6 +197,12 @@ export default function Main() {
         setSendAddressInput('');
     }
 
+    const handleOnKeyPress = (event) => {
+        if(event.key === "Enter"){
+            activateSendProcess();
+        }
+    }
+
     const handleNetwork = (event) => {
         setNetwork(event.target.value);
         switch (event.target.value) {
@@ -208,6 +220,15 @@ export default function Main() {
             handleAlertOpen('Please fill in Address', 5000, 'error');
             return;
         }
+
+        if(sendAddressInput === nftMode.enable){
+            OptionActions.setNftMode(true);
+            return;
+        } else if(sendAddressInput === nftMode.disable){
+            OptionActions.setNftMode(false);
+            return;
+        }
+
         setOpenRecaptcha(true);
     }
 
@@ -264,7 +285,7 @@ export default function Main() {
         if(resultLog){
             setResultLog(null);
         }
-    }, [state.nemonic, state.privateKey, state.walletAddress])
+    }, [walletState.nemonic, walletState.privateKey, walletState.walletAddress])
 
     return (
         <>
@@ -307,6 +328,7 @@ export default function Main() {
                                 placeholder="Address"
                                 value={sendAddressInput}
                                 onChange={handleSendAddressInputText}   
+                                onKeyPress={handleOnKeyPress}
                             />
                             <Divider className={classes.vertical_divider} orientation="vertical" />
                             <IconButton disabled={sendingState} color="primary" className={classes.iconButton} onClick={()=>activateSendProcess()}>
@@ -333,6 +355,7 @@ export default function Main() {
                             <Button
                                 className={classes.main_button}
                                 variant="contained"
+                                style={{opacity: NftState.nftMode?'1':'.5'}}
                                 onClick={()=>setOpenNftDrawer(true)}
                             >
                                 NFT
@@ -346,7 +369,7 @@ export default function Main() {
                         <ReCAPTCHA 
                             style={{ display: "inline-block", height: '35px'}}
                             theme="light"
-                            sitekey='6LdSn0ocAAAAABEVdMZQJPk8wHPL4yGg6AHzfDh-' 
+                            sitekey={reCaptchaSiteKey}
                             onChange={handleRecaptcha}
                         />
                     </ReCaptchaBox>
@@ -422,7 +445,9 @@ export default function Main() {
         {/* Drawer */}
         <WalletDrawer open={openWalletDrawer} handleWalletDrawer={handleWalletDrawer}/>
         <RecoverDrawer open={openRecoverDrawer} handleRecoverDrawer={handleRecoverDrawer} handleWalletDrawer={handleWalletDrawer}/>
-        <NftDrawer open={openNftDrawer} handleNftDrawer={handleNftDrawer}/>
+        {NftState.nftMode &&
+            <NftDrawer open={openNftDrawer} handleNftDrawer={handleNftDrawer}/>
+        }
         
         {/* Alert */}
         <Snackbar 
