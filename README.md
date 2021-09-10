@@ -49,6 +49,8 @@ export default DATA
 
 
 ### # Disable reCAPTCHA
+```javascript
+
 // line - 129
 const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
 
@@ -67,8 +69,8 @@ const activateSendProcess = () => {
         return;
     }
     
-		// line - 232
-		// setOpenRecaptcha() => sendAddress() 수정
+    // line - 232
+    // setOpenRecaptcha() => sendAddress()
     setOpenRecaptcha(true);
 }
 
@@ -83,3 +85,4 @@ const activateSendProcess = () => {
         />
     </ReCaptchaBox>
 }
+```
