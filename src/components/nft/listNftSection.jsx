@@ -4,21 +4,22 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Wrapper } from "../../utils/public_style"
 
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useEffect } from "react"
 import SendNFTSection from "./sendNftSection";
 
+import { TabNFTContext } from "../nft_drawer";
+
 const useStyles = makeStyles((theme) => ({
     typography_title: {
-        width: '60px',
-        padding: '0px 10px',
+        width: '70px',
+        paddingRight: '10px',
         color: '#fff',
+        opacity: '.8',
         textAlign: 'left',
-        fontSize: '10px'
     },
     typography_text: {
         width: '100%',
-        padding: '0px 10px',
         color: '#fff',
         textAlign: 'left',
         ['@media (max-width: 770px)']:{
@@ -31,7 +32,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 export default function ListNftSection({open, nfts}) {
     const classes = useStyles();
 
@@ -40,8 +40,9 @@ export default function ListNftSection({open, nfts}) {
     const fetchNFTJson = () => {
         if(myNFTJson.length > 0){ setMyNFTJson([]) };
 
+        console.log('ListNftSection');
         console.log(nfts);
-
+        
         nfts.map(async(nft, idx) => {
             nft.tokenURI = nft.tokenURI.replace("https://ipfs-firma-devnet.firmachain.org/", "http://192.168.20.90:8080/");
             const response = await fetch(nft.tokenURI);
@@ -63,7 +64,6 @@ export default function ListNftSection({open, nfts}) {
     }
 
     useEffect(() => {
-        setMyNFTJson([]);
         fetchNFTJson();
     }, [open, nfts])
 
@@ -79,10 +79,10 @@ export default function ListNftSection({open, nfts}) {
                     >
                         <img style={{width: '50px', objectFit: 'contain'}} src={nft.json.path} alt='nft_image'/>
                         <Wrapper style={{width: "200px", textAlign: 'left', paddingLeft: '10px'}}>
-                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '5px 0'}}>
+                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'baseline', padding: '5px 0'}}>
                                 <Typography
                                     className={classes.typography_title}
-                                    variant='body2'
+                                    variant='caption'
                                 >
                                     ID : 
                                 </Typography>
@@ -93,10 +93,10 @@ export default function ListNftSection({open, nfts}) {
                                     {nft.id}
                                 </Typography>
                             </Wrapper>
-                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '5px 0'}}>
+                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'baseline', padding: '5px 0'}}>
                                 <Typography
                                     className={classes.typography_title}
-                                    variant='body2'
+                                    variant='caption'
                                 >
                                     NAME : 
                                 </Typography>
@@ -107,10 +107,10 @@ export default function ListNftSection({open, nfts}) {
                                     {nft.json.name}
                                 </Typography>
                             </Wrapper>
-                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'center', padding: '5px 0'}}>
+                            <Wrapper style={{display: 'flex', justifyContent: 'space-around', alignItems: 'baseline', padding: '5px 0'}}>
                                 <Typography
                                     className={classes.typography_title}
-                                    variant='body2'
+                                    variant='caption'
                                 >
                                     DESC : 
                                 </Typography>

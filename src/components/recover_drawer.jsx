@@ -132,8 +132,10 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
     }, [recovery])
 
     useEffect(() => {
-        setNemonic('');
-        setPrivateKey('');
+        if(open){
+            setNemonic('');
+            setPrivateKey('');
+        }
     }, [open])
 
     return (

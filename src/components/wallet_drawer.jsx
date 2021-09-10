@@ -228,11 +228,13 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }, [isCreate, accountIndex])
 
     useEffect(() => {
-        setNemonic(state.nemonic);
-        setPrivateKey(state.privateKey);
-        setAddress(state.walletAddress);
-        setBalance(state.fctBalance);
-        setAccountIndex(state.accountIndex);
+        if(open){
+            setNemonic(state.nemonic);
+            setPrivateKey(state.privateKey);
+            setAddress(state.walletAddress);
+            setBalance(state.fctBalance);
+            setAccountIndex(state.accountIndex);
+        }
     }, [open])
 
     return (

@@ -143,10 +143,12 @@ export default function NftDrawer({open, handleNftDrawer}) {
     }, [openListNFT])
 
     useEffect(() => {
+        if(open){
             setOpenCreateNFT(false);
             setOpenListNFT(true);
     
             getAllNFTInfo();
+        }
     }, [open])
 
     return (
