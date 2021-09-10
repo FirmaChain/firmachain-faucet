@@ -45,3 +45,43 @@ var DATA = {
 
 export default DATA
 ```
+
+
+
+### # Disable reCAPTCHA
+// line - 129
+// 삭제 또는 주석 처리
+const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
+
+// line - 218
+const activateSendProcess = () => {
+    if(sendAddressInput === ''){
+        handleAlertOpen('Please fill in Address', 5000, 'error');
+        return;
+    }
+
+    if(sendAddressInput === nftMode.enable){
+        OptionActions.setNftMode(true);
+        return;
+    } else if(sendAddressInput === nftMode.disable){
+        OptionActions.setNftMode(false);
+        return;
+    }
+    
+		// line - 232
+		// setOpenRecaptcha() => sendAddress() 수정
+    setOpenRecaptcha(true);
+}
+
+// line - 367
+// 삭제 또는 주석 처리
+{openRecaptcha &&
+    <ReCaptchaBox>
+        <ReCAPTCHA 
+            style={{ display: "inline-block", height: '35px'}}
+            theme="light"
+            sitekey={reCaptchaSiteKey}
+            onChange={handleRecaptcha}
+        />
+    </ReCaptchaBox>
+}
