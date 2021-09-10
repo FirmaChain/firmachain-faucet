@@ -59,6 +59,14 @@ const useStyles = makeStyles((theme) => ({
         },
     },
 
+    typography_sub_text: {
+        padding: '0 10px 0 18px',
+        color: '#888',
+        ['@media (max-width: 770px)']:{
+            wordBreak: 'all',
+        },
+    },
+
     button: {
         backgroundColor: '#fff',
         width: '90%',
@@ -94,8 +102,11 @@ export default function CreateNFTSection(open) {
     
     const [nftFile, setNftFile] = useState(null);
     const [nftFileName, setNftFileName] = useState('');
+    const [nftFileSize, setNftFileSize] = useState('');
     const [nftName, setNftName] = useState('');
     const [nftDesc, setNftDesc] = useState('');
+
+    const [fileSizeText, setFileSizeText] = useState('');
 
     const [isMintNFT, setIsMintNFT] = useState(false);
     
@@ -114,9 +125,18 @@ export default function CreateNFTSection(open) {
         event.preventDefault();
         let reader = new FileReader();
         let file = event.target.files[0];
+
+        if(file.size / 1024 / 1024 > 1){
+            // file limit
+            handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
+            event.target.value = null;
+            return;
+        }
+
         reader.readAsArrayBuffer(file);
 
         reader.onload = function() {
+            setNftFileSize((file.size / 1024 / 1024).toFixed(2))
             setNftFileName(file.name);
             setNftFile(reader.result);
         }
@@ -183,7 +203,7 @@ export default function CreateNFTSection(open) {
                 <InputBase 
                     className={classes.attach_textfield}
                     disabled
-                    value={nftFileName}
+                    value={nftFileName + (nftFileName && ` (${nftFileSize} MB)`)}
                 />
                 <Divider className={classes.vertical_divider} orientation="vertical" />
                 <IconButton color="primary" component="label">
@@ -192,6 +212,12 @@ export default function CreateNFTSection(open) {
                 </IconButton>
             </Paper>
         </ListItem>
+        <Typography
+            className={classes.typography_sub_text}
+            variant='body2'
+        >
+            (Maximum file size : 20MB)
+        </Typography>
         <Typography
             className={classes.typography_text}
             variant='body2'
