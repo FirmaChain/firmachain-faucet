@@ -155,3 +155,10 @@ export const BackgroundBlur = styled.div`
     height: 100%;
     z-index: -80;
 `;
+
+export const NftCardTextBox = styled.div`
+    display: flex;
+    justify-content: space-around;
+    align-items: baseline;
+    padding: 5px 0;
+`

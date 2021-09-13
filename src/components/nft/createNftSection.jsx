@@ -126,7 +126,7 @@ export default function CreateNFTSection(open) {
         let reader = new FileReader();
         let file = event.target.files[0];
 
-        if(file.size / 1024 / 1024 > 1){
+        if(file.size / 1024 / 1024 > 20){
             // file limit
             handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
             event.target.value = null;
