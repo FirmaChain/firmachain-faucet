@@ -103,8 +103,10 @@ export default function CreateNFTSection(open) {
     const [nftFile, setNftFile] = useState(null);
     const [nftFileName, setNftFileName] = useState('');
     const [nftFileSize, setNftFileSize] = useState('');
+    
     const [nftName, setNftName] = useState('');
     const [nftDesc, setNftDesc] = useState('');
+    const [nftMemo, setNftMemo] = useState('');
 
     const [fileSizeText, setFileSizeText] = useState('');
 
@@ -119,6 +121,10 @@ export default function CreateNFTSection(open) {
 
     const onChangeNftDesc = (event) => {
         setNftDesc(event.target.value);
+    }
+    
+    const onChangeNftMemo = (event) => {
+        setNftMemo(event.target.value);
     }
 
     const fileChangedHandler = (event) => {
@@ -160,7 +166,7 @@ export default function CreateNFTSection(open) {
 
             let jsonUrl = FirmaIPFSRead.getURLFromHash(JsonHash);
 
-            let result = await MintNFT(state.privateKey, jsonUrl);
+            let result = await MintNFT(state.privateKey, jsonUrl, nftMemo);
             console.log(result);
 
             handleNFTButtons('list');
@@ -246,6 +252,22 @@ export default function CreateNFTSection(open) {
                 variant="outlined"
                 onChange={onChangeNftDesc}
                 value={nftDesc}
+            />
+        </ListItem>
+        <Typography
+            className={classes.typography_text}
+            variant='body2'
+        >
+            Memo
+        </Typography>
+        <ListItem>
+            <TextField
+                className={classes.disabled_textfield}
+                multiline
+                maxRows={5}
+                variant="outlined"
+                onChange={onChangeNftMemo}
+                value={nftMemo}
             />
         </ListItem>
         <Wrapper>

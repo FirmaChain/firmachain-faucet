@@ -84,7 +84,8 @@ export default function SendNFTSection({id}) {
 
     const state = useSelector(state => state.walletInfo);
     
-    const [toAddressInputText, settoAddressInputText] = useState('');
+    const [toAddress, setToAddress] = useState('');
+    const [memo, setMemo] = useState('');
     
     const [isTransferNFT, setIsTransferNFT] = useState(false);
     const [isBurnNFT, setIsBurnNFT] = useState(false);
@@ -96,14 +97,20 @@ export default function SendNFTSection({id}) {
         BurnNFT, 
         getTokenBalance, } = Wallet();
     
-    const onChangetoAddressInputText = (event) => {
-        settoAddressInputText(event.target.value);
+    const onChangeToAddress = (event) => {
+        setToAddress(event.target.value);
+    }
+    
+    const onChangeMemo = (event) => {
+        setMemo(event.target.value);
     }
     
     const transferNFTToken = async() => {
         handleLoadingOpen(true);
         try {
-            let transfer = await TransferNFT(state.privateKey, toAddressInputText, Number(NftIdIndex))
+            let transfer = await TransferNFT(state.privateKey, toAddress, Number(NftIdIndex), memo)
+            console.log(transfer);
+            
             let balance = await getTokenBalance(state.walletAddress);
             WalletInfoActions.setFctBalance(balance);
 
@@ -121,8 +128,8 @@ export default function SendNFTSection({id}) {
     const burnNFTToken = async() => {
         handleLoadingOpen(true);
         try {
-            let burn = await BurnNFT(state.privateKey, Number(NftIdIndex))
-            
+            let burn = await BurnNFT(state.privateKey, Number(NftIdIndex), memo)
+            console.log(burn);
             let balance = await getTokenBalance(state.walletAddress);
             WalletInfoActions.setFctBalance(balance);
 
@@ -160,8 +167,22 @@ export default function SendNFTSection({id}) {
             <TextField
                 className={classes.disabled_textfield}
                 variant="outlined"
-                onChange={onChangetoAddressInputText}
-                value={toAddressInputText}
+                onChange={onChangeToAddress}
+                value={toAddress}
+            />
+        </ListItem>
+        <Typography
+            className={classes.typography_text}
+            variant='body2'
+        >
+            Memo
+        </Typography>
+        <ListItem>
+            <TextField
+                className={classes.disabled_textfield}
+                variant="outlined"
+                onChange={onChangeMemo}
+                value={memo}
             />
         </ListItem>
         <Wrapper>

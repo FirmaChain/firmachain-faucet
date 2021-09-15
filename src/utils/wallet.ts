@@ -58,7 +58,7 @@ export function Wallet() {
         return balance;
     }
 
-    async function sendTokenByPrivateKey(privateKeyHex: string, targetAddress: string, amount: number) : Promise<BroadcastTxResponse> {
+    async function sendTokenByPrivateKey(privateKeyHex: string, targetAddress: string, amount: number, memo: string = "faucet") : Promise<BroadcastTxResponse> {
         let privateKey = Buffer.from(privateKeyHex.replace('0x', ''), 'hex');
         // Uint8Array 인풋으로 private 키를 넣으면, 바로 지갑 형태로 리턴해준다.
         let walletFromPrivateKey = await DirectSecp256k1Wallet.fromKey(privateKey, firmaWalletOption.prefix);
@@ -74,13 +74,13 @@ export function Wallet() {
         const gasFeeAmount = { denom: tokenDenom, amount: "2000" };
         const defaultFee = { amount: [gasFeeAmount], gas: "200000", };
 
-        let result = await bankTxClient.signAndBroadcast([message], { fee: defaultFee, memo: "faucet" });
+        let result = await bankTxClient.signAndBroadcast([message], { fee: defaultFee, memo: memo });
         
         return result;
     }
 
 
-    async function sendTokenByMnemonic(senderMnemonic: string, targetAddress: string, amount: number) : Promise<BroadcastTxResponse> {
+    async function sendTokenByMnemonic(senderMnemonic: string, targetAddress: string, amount: number, memo: string = "faucet") : Promise<BroadcastTxResponse> {
         const faucetWallet = await DirectSecp256k1HdWallet.fromMnemonic(senderMnemonic, firmaWalletOption);
         const bankTxClient = await BankTxClient(faucetWallet, { addr: chainTxAddress })
 
@@ -94,7 +94,7 @@ export function Wallet() {
         const gasFeeAmount = { denom: tokenDenom, amount: "2000" };
         const defaultFee = { amount: [gasFeeAmount], gas: "200000", };
 
-        let result = await bankTxClient.signAndBroadcast([message], { fee: defaultFee, memo: "faucet" });
+        let result = await bankTxClient.signAndBroadcast([message], { fee: defaultFee, memo: memo });
         
         return result;
     }
@@ -249,7 +249,7 @@ export function Wallet() {
         return nftItemList;
     }
     
-    async function MintNFT(privateKeyHex : string, tokenURI : string){
+    async function MintNFT(privateKeyHex : string, tokenURI : string, memo: string = "faucet"){
         
         let privateKey = Buffer.from(privateKeyHex.replace('0x', ''), 'hex');
         let walletFromPrivateKey = await DirectSecp256k1Wallet.fromKey(privateKey, firmaWalletOption.prefix);
@@ -261,7 +261,7 @@ export function Wallet() {
         let nftTxClient = await NftTxClient(walletFromPrivateKey, { addr: chainTxAddress })
     
         let message = await nftTxClient.msgMint({ owner: account[0].address, tokenURI: tokenURI });
-        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee, memo: "" });
+        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee, memo: memo });
     
         //console.log("[signAndBroadCast height] " + result.height);
         //console.log("[signAndBroadCast transactionHash] " + result.transactionHash);
@@ -270,7 +270,7 @@ export function Wallet() {
         return result;
     }
     
-    async function BurnNFT(privateKeyHex : string,  nftId : number){
+    async function BurnNFT(privateKeyHex : string,  nftId : number, memo: string = "faucet"){
         
         let privateKey = Buffer.from(privateKeyHex.replace('0x', ''), 'hex');
         let walletFromPrivateKey = await DirectSecp256k1Wallet.fromKey(privateKey, firmaWalletOption.prefix);
@@ -282,7 +282,7 @@ export function Wallet() {
         let nftTxClient = await NftTxClient(walletFromPrivateKey, { addr: chainTxAddress })
     
         let message = await nftTxClient.msgBurn({ owner : account[0].address, nftId : nftId});
-        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee });
+        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee, memo: memo });
     
         //console.log("[signAndBroadCast height] " + result.height);
         //console.log("[signAndBroadCast transactionHash] " + result.transactionHash);
@@ -291,7 +291,7 @@ export function Wallet() {
         return result;
     }
     
-    async function TransferNFT(privateKeyHex : string, targetAddress : string, nftId : number){
+    async function TransferNFT(privateKeyHex : string, targetAddress : string, nftId : number, memo: string = "faucet"){
         
         let privateKey = Buffer.from(privateKeyHex.replace('0x', ''), 'hex');
         let walletFromPrivateKey = await DirectSecp256k1Wallet.fromKey(privateKey, firmaWalletOption.prefix);
@@ -303,7 +303,7 @@ export function Wallet() {
         let nftTxClient = await NftTxClient(walletFromPrivateKey, { addr: chainTxAddress })
     
         let message = await nftTxClient.msgTransfer({ owner : account[0].address, nftId : nftId, toAddress : targetAddress});
-        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee });
+        let result = await nftTxClient.signAndBroadcast([message], { fee: defaultFee, memo: memo });
     
         //console.log("[signAndBroadCast height] " + result.height);
         //console.log("[signAndBroadCast transactionHash] " + result.transactionHash);

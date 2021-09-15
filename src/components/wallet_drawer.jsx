@@ -84,8 +84,9 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const [accountIndex, setAccountIndex] = useState(state.accountIndex);
     const [balance, setBalance] = useState(state.fctBalance);
     
-    const [toAddressInputText, settoAddressInputText] = useState('');
-    const [amountInputText, settoMountInputText] = useState('');
+    const [toAddress, setToAddress] = useState('');
+    const [amount, setAmount] = useState('');
+    const [memo, setMemo] = useState('');
     const [isSendToken, setIsSendToken] = useState(false);
 
     const [isCreate, setIsCreate] = useState(false);
@@ -101,17 +102,22 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         setAccountIndex(event.target.value);
     }
     
-    const onChangetoAddressInputText = (event) => {
-        settoAddressInputText(event.target.value);
+    const onChangeToAddress = (event) => {
+        setToAddress(event.target.value);
     }
 
-    const onChangetoAmountInputText = (event) => {
-        settoMountInputText(event.target.value);
+    const onChangeAmount = (event) => {
+        setAmount(event.target.value);
+    }
+    
+    const onChangeMemo = (event) => {
+        setMemo(event.target.value);
     }
 
-    const resetToAddressAndAmount = () => {
-        settoAddressInputText('');
-        settoMountInputText('');
+    const resetSendInputData = () => {
+        setToAddress('');
+        setAmount('');
+        setMemo('');
     }
 
     const handleClipboard = (event, label) => {
@@ -171,27 +177,28 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }
 
     const sendToken = async() => {
-        if(toAddressInputText === '') {
+        if(toAddress === '') {
             handleAlertOpen('Please fill in to address', 5000, 'error');
             return;
         }
-        if(amountInputText === ''){
+        if(amount === ''){
             handleAlertOpen('Please fill in amount', 5000, 'error');
             return;
         }
 
         handleLoadingOpen(true);
         try {
-            let send = await sendTokenByPrivateKey(privateKey, toAddressInputText, Number(amountInputText));
-            console.log(send);
+            let send = await sendTokenByPrivateKey(privateKey, toAddress, Number(amount), memo);
             getWalletData();
             handleLoadingOpen(false);
-            resetToAddressAndAmount();
+            setIsSendToken(false);
+            resetSendInputData();
             handleAlertOpen('Send token success', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
             handleLoadingOpen(false);
-            resetToAddressAndAmount();
+            setIsSendToken(false);
+            resetSendInputData();
             handleAlertOpen(error.message, 5000, 'error');
         }
     }
@@ -380,8 +387,8 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             <TextField
                                 className={classes.disabled_textfield}
                                 variant="outlined"
-                                onChange={onChangetoAddressInputText}
-                                value={toAddressInputText}
+                                onChange={onChangeToAddress}
+                                value={toAddress}
                             />
                         </ListItem>
                         <Typography
@@ -394,8 +401,22 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             <TextField
                                 className={classes.disabled_textfield}
                                 variant="outlined"
-                                onChange={onChangetoAmountInputText}
-                                value={amountInputText}
+                                onChange={onChangeAmount}
+                                value={amount}
+                            />
+                        </ListItem>
+                        <Typography
+                            className={classes.typography_text}
+                            variant='body2'
+                        >
+                            Memo
+                        </Typography>
+                        <ListItem>
+                            <TextField
+                                className={classes.disabled_textfield}
+                                variant="outlined"
+                                onChange={onChangeMemo}
+                                value={memo}
                             />
                         </ListItem>
                         <Wrapper>
