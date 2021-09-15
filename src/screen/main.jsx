@@ -221,14 +221,6 @@ export default function Main() {
             return;
         }
 
-        if(sendAddressInput === nftMode.enable){
-            OptionActions.setNftMode(true);
-            return;
-        } else if(sendAddressInput === nftMode.disable){
-            OptionActions.setNftMode(false);
-            return;
-        }
-
         setOpenRecaptcha(true);
     }
 

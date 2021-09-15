@@ -1,5 +1,5 @@
 const initState ={
-    nftMode: false,
+    nftMode: true,
 }
 
 const reducer = (state = initState, action) => {
