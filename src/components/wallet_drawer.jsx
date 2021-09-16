@@ -13,13 +13,12 @@ import { Wrapper } from "../utils/public_style"
 import { useContext, useState } from "react"
 import { useEffect } from "react"
 
-import { Wallet } from "../utils/wallet"
-
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions"
 
 import copy from "copy-to-clipboard"
 import { UtilsContext } from "../screen/main"
+import { WalletUtil } from "../utils/wallet_util"
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -61,6 +60,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function WalletDrawer({open, handleWalletDrawer}) {
+    const {
+        sendToken,
+        newWallet,
+        getWallet,
+    } = WalletUtil();
+
     const { 
         handleAlertOpen,
         handleLoadingOpen } = useContext(UtilsContext);
@@ -68,14 +73,6 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const classes = useStyles();
     const DrawerTitle = 'Wallet';
 
-    const {
-        sendTokenByPrivateKey,
-        createNewWallet,
-        getPrivateKey,
-        getAddressFromPrivateKey,
-        getTokenBalance,
-    } = Wallet();
-    
     const state = useSelector(state => state.walletInfo);
 
     const [nemonic, setNemonic] = useState(state.nemonic);
@@ -114,7 +111,16 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         setMemo(event.target.value);
     }
 
-    const resetSendInputData = () => {
+    const setWalletInfo = (wallet) => {
+        setNemonic(wallet.nemonic);
+        setPrivateKey(wallet.privateKey);
+        setAddress(wallet.address);
+        setBalance(wallet.balance);
+    }
+
+    const resetSendStatus = () => {
+        handleLoadingOpen(false);
+        setIsSendToken(false);
         setToAddress('');
         setAmount('');
         setMemo('');
@@ -135,18 +141,11 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const closeDrawer = () => {
         handleWalletDrawer(false)
     };
-
     
     async function createWallet() {
         try {
-            let newWallet = await createNewWallet();
-            setNemonic(newWallet.mnemonic);
-            let _privateKey = await getPrivateKey(newWallet.mnemonic, 0);
-            setPrivateKey(_privateKey);
-            let _adrFromPrivateKey = await getAddressFromPrivateKey(_privateKey);
-            setAddress(_adrFromPrivateKey);
-            let _balance = await getTokenBalance(_adrFromPrivateKey);
-            setBalance(_balance);
+            let newWallet = await newWallet();
+            setWalletInfo(newWallet)
 
             handleAlertOpen('Created your wallet', 3000, 'success');
         } catch (error) {
@@ -156,27 +155,19 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }
     
     async function getWalletData(idx = 0){
+        handleLoadingOpen(true);
         try {
-            let _privateKey;
-            if(nemonic !== ''){
-                _privateKey = await getPrivateKey(nemonic, Number(idx));
-                setPrivateKey(_privateKey);
-            } else {
-                _privateKey = privateKey
-            }
-            let _adrFromPrivateKey = await getAddressFromPrivateKey(_privateKey);
-            setAddress(_adrFromPrivateKey);
-            
-            let _balance = await getTokenBalance(_adrFromPrivateKey);
-            setBalance(_balance);
-            
+            let wallet = await getWallet(idx);
+            setWalletInfo(wallet);
+            handleLoadingOpen(false);
         } catch (error) {
+            handleLoadingOpen(false);
             console.log("[error] " + error);
             handleAlertOpen(error.message, 5000, 'error');
         }
     }
 
-    const sendToken = async() => {
+    const tokenSend = async() => {
         if(toAddress === '') {
             handleAlertOpen('Please fill in to address', 5000, 'error');
             return;
@@ -188,42 +179,31 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
 
         handleLoadingOpen(true);
         try {
-            let send = await sendTokenByPrivateKey(privateKey, toAddress, Number(amount), memo);
-            getWalletData();
-            handleLoadingOpen(false);
-            setIsSendToken(false);
-            resetSendInputData();
+            let send = await sendToken(toAddress, amount);
+            let wallet = await getWallet();
+            setWalletInfo(wallet);
+            resetSendStatus();
             handleAlertOpen('Send token success', 3000, 'success');
         } catch (error) {
             console.log("[error] " + error);
-            handleLoadingOpen(false);
-            setIsSendToken(false);
-            resetSendInputData();
+            resetSendStatus();
             handleAlertOpen(error.message, 5000, 'error');
         }
     }
 
-    const saveWalletInfoToRedux = () => {
-        WalletInfoActions.setNemonic(nemonic);
-        WalletInfoActions.setPrivateKey(privateKey);
-        WalletInfoActions.setWalletAddress(address);
-        WalletInfoActions.setAccountIndex(accountIndex);
-        WalletInfoActions.setFctBalance(balance);
-    }
-
     useEffect(() => {
         if(isSendToken){
-            sendToken();
+            tokenSend();
         }
     }, [isSendToken])
 
     useEffect(() => {
-        saveWalletInfoToRedux();
-    }, [nemonic, privateKey, address, accountIndex, balance])
+        WalletInfoActions.setAccountIndex(accountIndex);
+    }, [accountIndex])
 
     useEffect(() => {
         if(isCreate){
-            createWallet();        
+            createWallet();
         } else {
             if(state.nemonic !== ''){
                 getWalletData(Number(accountIndex));
