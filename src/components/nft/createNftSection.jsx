@@ -1,19 +1,20 @@
-import { Button, IconButton, Paper } from "@material-ui/core"
-import { TextField, InputBase, Typography } from "@material-ui/core"
-import { ListItem } from "@material-ui/core"
-import { Divider } from "@material-ui/core"
+import { Button, IconButton, Paper } from "@material-ui/core";
+import { TextField, InputBase, Typography } from "@material-ui/core";
+import { ListItem } from "@material-ui/core";
+import { Divider } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 import FileIcon from '@material-ui/icons/AttachFile'
 
-import { Wrapper } from "../../utils/public_style"
+import { Wrapper } from "../../utils/public_style";
 
-import { useContext, useEffect } from "react"
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 
-import { useSelector } from "react-redux"
-import { Wallet } from "../../utils/wallet"
 import { UtilsContext } from "../../screen/main";
 import { TabNFTContext } from "../nft_drawer";
+
+import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
+import { NftUtil } from "../../utils/nft_util";
 
 const IPFS = require('../../utils/ipfs_api');
 
@@ -82,6 +83,10 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CreateNFTSection(open) {
+    const {
+        newNft,
+    } = NftUtil();
+
     const { handleNFTButtons } = useContext(TabNFTContext);
 
     const {
@@ -96,25 +101,18 @@ export default function CreateNFTSection(open) {
     let FirmaIPFSWrite = new IPFS();
     FirmaIPFSWrite.setIPFSNode('https://ipfs-api-firma-devnet.firmachain.org');
     
-    const state = useSelector(state => state.walletInfo);
-    
     const classes = useStyles();
     
     const [nftFile, setNftFile] = useState(null);
     const [nftFileName, setNftFileName] = useState('');
     const [nftFileSize, setNftFileSize] = useState('');
-    
+
     const [nftName, setNftName] = useState('');
     const [nftDesc, setNftDesc] = useState('');
     const [nftMemo, setNftMemo] = useState('');
 
-    const [fileSizeText, setFileSizeText] = useState('');
-
     const [isMintNFT, setIsMintNFT] = useState(false);
     
-    const { 
-        MintNFT } = Wallet();
-
     const onChangeNftName = (event) => {
         setNftName(event.target.value);
     }
@@ -166,8 +164,8 @@ export default function CreateNFTSection(open) {
 
             let jsonUrl = FirmaIPFSRead.getURLFromHash(JsonHash);
 
-            let result = await MintNFT(state.privateKey, jsonUrl, nftMemo);
-            console.log(result);
+            // memo 넣어야 함
+            let result = await newNft(jsonUrl);
 
             handleNFTButtons('list');
             handleAlertOpen('Created new NFT', 3000, 'success');
@@ -183,7 +181,6 @@ export default function CreateNFTSection(open) {
 
     const replaceTextData = (text) => {
         let inputText = text.replace("\n", '\\n');
-        console.log(inputText);
         return inputText;
     }
 
@@ -193,9 +190,6 @@ export default function CreateNFTSection(open) {
         }
     }, [isMintNFT])
     
-    useEffect(() => {
-    }, [open])
-
     return (
         <>
         <Typography
