@@ -82,8 +82,6 @@ export default function ListNftSection({open, nfts}) {
         {(!isFetching && myNFTJson.length === nfts.length) &&
             <>
             {myNFTJson.map((nft, index) => {
-                console.log('NFTS ['+index+"]");
-                console.log(nfts[index]);
                 let toeken_uri = nfts[index].tokenURI.split('https://')[1];
                 return (
                     <>

@@ -1,4 +1,4 @@
-import { Button, Select, MenuItem } from "@material-ui/core"
+import { Button } from "@material-ui/core"
 import { TextField, Typography } from "@material-ui/core"
 import { ListItem } from "@material-ui/core"
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,12 +8,13 @@ import { Wrapper } from "../../utils/public_style"
 import { useContext, useState } from "react"
 import { useEffect } from "react"
 
-import { WalletInfoActions } from "../../redux/actions"
 import { useSelector } from "react-redux"
 
-import { Wallet } from "../../utils/wallet"
 import { UtilsContext } from "../../screen/main";
 import { TabNFTContext } from "../nft_drawer";
+
+import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
+import { NftUtil } from "../../utils/nft_util";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -71,9 +72,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-// export default function SendNFTSection({open, nfts, getAllNFTInfo}) {
 export default function SendNFTSection({id}) {
-    const { getAllNFTInfo } = useContext(TabNFTContext);
+    var firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
+
+    const {
+        transferNft
+    } = NftUtil();
+
+    const { 
+        getAllNFTInfo 
+    } = useContext(TabNFTContext);
 
     const { 
         handleAlertOpen,
@@ -87,15 +95,10 @@ export default function SendNFTSection({id}) {
     const [toAddress, setToAddress] = useState('');
     const [memo, setMemo] = useState('');
     
-    const [isTransferNFT, setIsTransferNFT] = useState(false);
+    const [isSendNFT, setIsSendNFT] = useState(false);
     const [isBurnNFT, setIsBurnNFT] = useState(false);
 
     const NftIdIndex = id;
-    
-    const { 
-        TransferNFT,
-        BurnNFT, 
-        getTokenBalance, } = Wallet();
     
     const onChangeToAddress = (event) => {
         setToAddress(event.target.value);
@@ -104,56 +107,35 @@ export default function SendNFTSection({id}) {
     const onChangeMemo = (event) => {
         setMemo(event.target.value);
     }
-    
-    const transferNFTToken = async() => {
-        handleLoadingOpen(true);
-        try {
-            let transfer = await TransferNFT(state.privateKey, toAddress, Number(NftIdIndex), memo)
-            console.log(transfer);
-            
-            let balance = await getTokenBalance(state.walletAddress);
-            WalletInfoActions.setFctBalance(balance);
 
-            getAllNFTInfo();
-            setIsTransferNFT(false);
-            handleLoadingOpen(false);        
-            handleAlertOpen('Transfer NFT Success', 3000, 'success');
-        } catch (error) {
-            console.log("[error] " + error);
-            handleAlertOpen(error.message, 5000, 'error');
-            handleLoadingOpen(false);
-        }
+    const resetTransferStatus = () => {
+        setIsSendNFT(false);
+        setIsBurnNFT(false);
+        handleLoadingOpen(false);
     }
     
-    const burnNFTToken = async() => {
+    const NFTTransfer = async() => {
         handleLoadingOpen(true);
         try {
-            let burn = await BurnNFT(state.privateKey, Number(NftIdIndex), memo)
-            console.log(burn);
-            let balance = await getTokenBalance(state.walletAddress);
-            WalletInfoActions.setFctBalance(balance);
+            // memo 들어가야 함
+            let transfer = await transferNft(
+                isSendNFT? 'send' : 'burn',
+                isSendNFT? toAddress : '',
+                Number(NftIdIndex));
 
             getAllNFTInfo();
-            setIsBurnNFT(false);
-            handleLoadingOpen(false);
-            handleAlertOpen('Burned NFT', 3000, 'success');
+            resetTransferStatus();
+            handleAlertOpen(isSendNFT? 'Transfer NFT success':'Burned NFT', 3000, 'success');
         } catch (error) {
-            console.log("[error] " + error);
+            resetTransferStatus();
             handleAlertOpen(error.message, 3000, 'error');
-            setIsBurnNFT(false);
-            handleLoadingOpen(false);
+            console.log("[error] " + error);
         }
     }
 
     useEffect(() => {
-        if(isTransferNFT){
-            transferNFTToken();
-        }
-
-        if(isBurnNFT){
-            burnNFTToken();
-        }
-    }, [isTransferNFT, isBurnNFT])
+        if(isSendNFT || isBurnNFT) NFTTransfer();
+    }, [isSendNFT, isBurnNFT])
 
     return (
         <>
@@ -189,8 +171,8 @@ export default function SendNFTSection({id}) {
             <Button 
                 className={classes.button}
                 variant="contained"
-                disabled={isTransferNFT || isBurnNFT}
-                onClick={()=>setIsTransferNFT(true)}
+                disabled={isSendNFT || isBurnNFT}
+                onClick={()=>setIsSendNFT(true)}
             >Send</Button>
         </Wrapper>
         
@@ -198,7 +180,7 @@ export default function SendNFTSection({id}) {
             <Button 
                 className={classes.button}
                 variant="contained"
-                disabled={isTransferNFT || isBurnNFT}
+                disabled={isSendNFT || isBurnNFT}
                 onClick={()=>setIsBurnNFT(true)}
             >Burn</Button>
         </Wrapper>
