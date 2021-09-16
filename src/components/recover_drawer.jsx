@@ -11,10 +11,10 @@ import { Wrapper } from "../utils/public_style"
 import { useContext, useState } from "react"
 import { useEffect } from "react"
 
-import { Wallet } from "../utils/wallet"
 import { WalletInfoActions } from "../redux/actions"
-import { useSelector } from "react-redux"
 import { UtilsContext } from "../screen/main"
+
+import { WalletUtil } from "../utils/wallet_util"
 
 const useStyles = makeStyles((theme) => ({
     divider: {
@@ -50,19 +50,17 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDrawer}) {
-    const { handleAlertOpen } = useContext(UtilsContext);
+    const {
+        recoverWallet,
+    } = WalletUtil();
+
+    const { 
+        handleAlertOpen 
+    } = useContext(UtilsContext);
 
     const classes = useStyles();
     const DrawerTitle = 'Recover';
 
-    const state = useSelector(state => state.walletInfo);
-
-    const {
-        getPrivateKey,
-        getAddressFromPrivateKey,
-        getTokenBalance,
-    } = Wallet();
-    
     const [nemonic, setNemonic] = useState('');
     const [privateKey, setPrivateKey] =  useState('');
 
@@ -84,31 +82,18 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
         setPrivateKey(event.target.value)
     }
 
-    const recoverWallet = async() => {
+    const walletRecover = async() => {
         if(nemonic === '' && privateKey === ''){
             handleAlertOpen('Please fill in Nemonic or Privete key', 5000, 'error');
             return;
         } else {
             try{
-                let _privateKey = privateKey;
-                let _walletAdr;
-                let _balance;
-
+                let wallet;
                 if(nemonic !== ''){
-                    WalletInfoActions.setNemonic(nemonic);
-                    _privateKey = await getPrivateKey(nemonic, 0);
-                    setPrivateKey(_privateKey);
+                    wallet = await recoverWallet(nemonic, 'nemonic');
                 } else {
-                    setNemonic('');
-                    WalletInfoActions.setNemonic('');
+                    wallet = await recoverWallet(privateKey, 'privatekey');
                 }
-                WalletInfoActions.setPrivateKey(_privateKey);
-
-                _walletAdr = await getAddressFromPrivateKey(_privateKey);
-                WalletInfoActions.setWalletAddress(_walletAdr);
-
-                _balance = await getTokenBalance(_walletAdr);
-                WalletInfoActions.setFctBalance(_balance);
 
                 WalletInfoActions.setWalletExist(true);
 
@@ -124,7 +109,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
 
     useEffect(() => {
         if(recovery){
-            recoverWallet();
+            walletRecover();
         }
         return () => {
             setRecovery(false);
