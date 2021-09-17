@@ -1,9 +1,12 @@
 import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 
+import DATA from "../config";
+
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions";
 
 const firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
+const faucetMnemonic = DATA.faucetMnemonic;
 
 export function WalletUtil() {
     const state = useSelector(state => state.walletInfo);
@@ -88,6 +91,16 @@ export function WalletUtil() {
         return send;
     }
 
+    const sendTokenFromFaucet = async(address) => {
+        let FCTAmount = 1000; // 2000fct(테라 기준)
+        let memo = 'faucet';
+
+        let faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
+        let send = await firmaSDK.Wallet.send(faucetWallet, address, Number(FCTAmount), memo);
+
+        return send;
+    }
+
     return {
         SDK,
         newWallet,
@@ -96,5 +109,6 @@ export function WalletUtil() {
         getCurrentWallet,
         getWalletBalance,
         sendToken,
+        sendTokenFromFaucet,
     }
 }

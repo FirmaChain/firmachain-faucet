@@ -144,8 +144,8 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     
     async function createWallet() {
         try {
-            let newWallet = await newWallet();
-            setWalletInfo(newWallet)
+            let wallet = await newWallet();
+            setWalletInfo(wallet)
 
             handleAlertOpen('Created your wallet', 3000, 'success');
         } catch (error) {
@@ -179,7 +179,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
 
         handleLoadingOpen(true);
         try {
-            let send = await sendToken(toAddress, amount);
+            let send = await sendToken(toAddress, amount, memo);
             let wallet = await getWallet();
             setWalletInfo(wallet);
             resetSendStatus();

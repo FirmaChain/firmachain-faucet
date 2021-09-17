@@ -12,7 +12,6 @@ import WalletDrawer from '../components/wallet_drawer';
 import RecoverDrawer from '../components/recover_drawer';
 import NftDrawer from '../components/nft_drawer';
 
-import { Wallet } from '../utils/wallet';
 import { LoadingProgress } from '../components/loading/loading_progress';
 
 import { Alert } from '@material-ui/lab';
@@ -155,13 +154,8 @@ export default function Main() {
 
     const {
         getWalletBalance,
-    } = WalletUtil();
-
-    const { 
-        changeChainTxAddress,
         sendTokenFromFaucet,
-        getTokenBalance, } = Wallet();
-
+    } = WalletUtil();
 
     const moveToExplorer = () => {
         window.open('https://explorer-devnet.firmachain.org/', '_blank')
@@ -211,9 +205,9 @@ export default function Main() {
         setNetwork(event.target.value);
         switch (event.target.value) {
             case 'imperium':
-                return changeChainTxAddress('https://imperium-node1.firmachain.org:26657');
+                break;
             case 'colosseum':
-                return changeChainTxAddress('https://colosseum-node1.firmachain.org:26657');
+                break;
             default:
                 break;
         }
@@ -243,10 +237,8 @@ export default function Main() {
         setSendingState(true);
 
         try {
-            let testFCTAmount = 1000; // 2000fct(테라 기준)
-            let result = await sendTokenFromFaucet(sendAddressInput, testFCTAmount);
-            console.log(result.code);
-            const resultCode = result.code === 0? 'Success':result.code;
+            let result = await sendTokenFromFaucet(sendAddressInput);
+            const resultCode = result.code === 0? 'Success' : result.code;
             setResultLog({
                 code : resultCode,
                 gasUsed: result.gasUsed,
