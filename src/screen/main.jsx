@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, FooterBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
-import { OptionActions, WalletInfoActions } from '../redux/actions';
+import { WalletInfoActions } from '../redux/actions';
 
 import WalletDrawer from '../components/wallet_drawer';
 import RecoverDrawer from '../components/recover_drawer';
@@ -19,6 +19,7 @@ import { Alert } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
 
 import DATA from "../config";
+import { WalletUtil } from '../utils/wallet_util';
 
 export const UtilsContext = React.createContext();
 
@@ -125,7 +126,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-    const nftMode = DATA.NftMode;
     const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
 
     const walletState = useSelector(state => state.walletInfo);
@@ -152,6 +152,10 @@ export default function Main() {
     const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
     const [openRecoverDrawer, setOpenRecoverDrawer] = useState(false);
     const [openNftDrawer, setOpenNftDrawer] = useState(false);
+
+    const {
+        getWalletBalance,
+    } = WalletUtil();
 
     const { 
         changeChainTxAddress,
@@ -224,6 +228,14 @@ export default function Main() {
         setOpenRecaptcha(true);
     }
 
+    const resetSendStatus = () => {
+        resetSendAddressInputText();
+
+        setOpenRecaptcha(false);
+        handleLoadingOpen(false);
+        setSendingState(false);
+    }
+
     const sendAddress = async() => {
         // 전송중이면 return
         if(sendingState)return;
@@ -245,19 +257,14 @@ export default function Main() {
             })
             handleAlertClose();
             
-            let balance = await getTokenBalance(sendAddressInput);
+            let balance = await getWalletBalance();
             WalletInfoActions.setFctBalance(balance);
 
-            resetSendAddressInputText();
-            setOpenRecaptcha(false);
-            handleLoadingOpen(false);
-            setSendingState(false);
+            resetSendStatus();
         } catch (error) {
             console.log("[error] " + error);
             handleAlertOpen(error.message, 5000, 'error');
-            setSendingState(false);
-            setOpenRecaptcha(false);
-            handleLoadingOpen(false);
+            resetSendStatus();
         }
     }
 

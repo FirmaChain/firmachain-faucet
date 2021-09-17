@@ -3,12 +3,16 @@ import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions";
 
+const firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
+
 export function WalletUtil() {
     const state = useSelector(state => state.walletInfo);
-    var firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
+    const SDK = () => {
+        return firmaSDK;
+    };
 
     const newWallet = async() => {
-        let wallet = await firmaSDK.Wallet.NewWallet();
+        let wallet = await SDK().Wallet.NewWallet();
         return organizeWallet(wallet);
     }
 
@@ -22,10 +26,10 @@ export function WalletUtil() {
         let wallet;
         switch (type) {
             case 'nemonic':
-                wallet = await firmaSDK.Wallet.fromMnemoic(data);
+                wallet = await SDK().Wallet.fromMnemonic(data);
                 break;
             case 'privatekey':
-                wallet = await firmaSDK.Wallet.fromPrivateKey(data);
+                wallet = await SDK().Wallet.fromPrivateKey(data);
                 break;
             default:
                 break;
@@ -35,7 +39,7 @@ export function WalletUtil() {
     }
 
     const organizeWallet = async(wallet) => {
-        let _nemonic = await wallet.getMnemoic();
+        let _nemonic = await wallet.getMnemonic();
         let _privateKey = await wallet.getPrivateKey();
         let _address = await wallet.getAddress();
         let _balance = await wallet.getBalance();
@@ -57,16 +61,16 @@ export function WalletUtil() {
 
     const getCurrentWallet = async(index = 0) => {
         if(state.nemonic !== ''){
-            let wallet = await firmaSDK.Wallet.fromMnemoic(state.nemonic, index);
+            let wallet = await SDK().Wallet.fromMnemonic(state.nemonic, index);
             return wallet;
         } else {
-            let wallet = await firmaSDK.Wallet.fromPrivateKey(state.privateKey);
+            let wallet = await SDK().Wallet.fromPrivateKey(state.privateKey);
             return wallet;
         }
     }
 
     const getWalletBalance = async() => {
-        let balance = await firmaSDK.Wallet.getBalance(state.walletAddress);
+        let balance = await SDK().Wallet.getBalance(state.walletAddress);
         
         return getFCTStringFromUFCT(balance);
     }
@@ -77,14 +81,15 @@ export function WalletUtil() {
         return (number / 1000000).toString();
     }
 
-    const sendToken = async(address, amount) => {
+    const sendToken = async(address, amount, memo) => {
         let wallet = await getCurrentWallet();
-        let send = await firmaSDK.Wallet.send(wallet, address, Number(amount));
+        let send = await firmaSDK.Wallet.send(wallet, address, Number(amount), memo);
 
         return send;
     }
 
     return {
+        SDK,
         newWallet,
         getWallet,
         recoverWallet,
