@@ -13,10 +13,7 @@ import { useState } from "react";
 import { UtilsContext } from "../../screen/main";
 import { TabNFTContext } from "../nft_drawer";
 
-import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 import { NftUtil } from "../../utils/nft_util";
-
-const IPFS = require('../../utils/ipfs_api');
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -94,13 +91,6 @@ export default function CreateNFTSection(open) {
         handleLoadingOpen,
      } = useContext(UtilsContext);
 
-    let FirmaIPFSRead = new IPFS();
-    FirmaIPFSRead.setIPFSNode('https://ipfs-firma-devnet.firmachain.org');
-    // FirmaIPFSRead.setIPFSNode('http://192.168.20.90:8080');
-
-    let FirmaIPFSWrite = new IPFS();
-    FirmaIPFSWrite.setIPFSNode('https://ipfs-api-firma-devnet.firmachain.org');
-    
     const classes = useStyles();
     
     const [nftFile, setNftFile] = useState(null);
@@ -129,7 +119,6 @@ export default function CreateNFTSection(open) {
         event.preventDefault();
         let reader = new FileReader();
         let file = event.target.files[0];
-
         if(file.size / 1024 / 1024 > 20){
             // file limit
             handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
@@ -156,16 +145,12 @@ export default function CreateNFTSection(open) {
         handleLoadingOpen(true);
         
         try {
-            let fileHash = await FirmaIPFSWrite.addFile(nftFile);
-            let fileUrl = FirmaIPFSRead.getURLFromHash(fileHash);
-
-            let Json = '{\"name\" : \"'+ replaceTextData(nftName)+'\", \"description\" : \"'+ replaceTextData(nftDesc)+'\", \"path\" : \"'+ fileUrl+'\"}';
-            let JsonHash = await FirmaIPFSWrite.addJson(Json);
-
-            let jsonUrl = FirmaIPFSRead.getURLFromHash(JsonHash);
-
-            // memo 넣어야 함
-            let result = await newNft(jsonUrl);
+            let result = await newNft(
+                nftFile, 
+                replaceTextData(nftName),
+                replaceTextData(nftDesc),
+                nftMemo
+                );
 
             handleNFTButtons('list');
             handleAlertOpen('Created new NFT', 3000, 'success');

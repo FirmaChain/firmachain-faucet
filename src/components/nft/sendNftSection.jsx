@@ -73,8 +73,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SendNFTSection({id}) {
-    var firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
-
     const {
         transferNft
     } = NftUtil();
@@ -90,8 +88,6 @@ export default function SendNFTSection({id}) {
 
     const classes = useStyles();
 
-    const state = useSelector(state => state.walletInfo);
-    
     const [toAddress, setToAddress] = useState('');
     const [memo, setMemo] = useState('');
     
@@ -121,7 +117,8 @@ export default function SendNFTSection({id}) {
             let transfer = await transferNft(
                 isSendNFT? 'send' : 'burn',
                 isSendNFT? toAddress : '',
-                Number(NftIdIndex));
+                Number(NftIdIndex),
+                memo);
 
             getAllNFTInfo();
             resetTransferStatus();

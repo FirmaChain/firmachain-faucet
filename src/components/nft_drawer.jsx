@@ -13,13 +13,14 @@ import React, { useContext, useState } from "react"
 import { useEffect } from "react"
 
 import { useSelector } from "react-redux"
-import { Wallet } from "../utils/wallet"
 import ListNFTSection from "./nft/listNftSection"
 import CreateNFTSection from "./nft/createNftSection"
 
 import copy from "copy-to-clipboard"
 import { WalletInfoActions } from "../redux/actions"
 import { UtilsContext } from "../screen/main"
+import { NftUtil } from "../utils/nft_util"
+import { WalletUtil } from "../utils/wallet_util"
 
 export const TabNFTContext = React.createContext();
 
@@ -80,7 +81,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function NftDrawer({open, handleNftDrawer}) {
-    const { handleAlertOpen, handleLoadingOpen } = useContext(UtilsContext);
+    const {
+        nftList,
+    } = NftUtil();
+
+    const {
+        getWalletBalance,
+    } = WalletUtil();
+    
+    const { 
+        handleAlertOpen, 
+        handleLoadingOpen 
+    } = useContext(UtilsContext);
 
     const classes = useStyles();
     const DrawerTitle = 'NFT';
@@ -92,11 +104,6 @@ export default function NftDrawer({open, handleNftDrawer}) {
     // Drawer section open 관련 변수
     const [openListNFT, setOpenListNFT] = useState(true);
     const [openCreateNFT, setOpenCreateNFT] = useState(true);
-
-    const { 
-        getTokenBalance,
-        getAllNFT,
-        getNFTBalanceAll, } = Wallet();
 
     const handleClipboard = (event, label) => {
         if(event.target.value === '' || event.target.value === undefined){
@@ -118,8 +125,8 @@ export default function NftDrawer({open, handleNftDrawer}) {
     const getAllNFTInfo = async() => {
         handleLoadingOpen(true);
         try {
-            let nftItemList = await getAllNFT(state.walletAddress);
-            setMyNFT(nftItemList)
+            let nfts = await nftList();
+            setMyNFT(nfts.data);
 
             getBalance();
             handleLoadingOpen(false);
@@ -131,7 +138,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
 
     const getBalance = async() => {
         try {
-            let _balance = await getTokenBalance(state.walletAddress);
+            let _balance = await getWalletBalance();
             WalletInfoActions.setFctBalance(_balance);
         } catch (error) {
             console.log("[error] " + error);
@@ -204,7 +211,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                                     className={classes.disabled_textfield}
                                     variant="outlined"
                                     disabled
-                                    value={state.fctBalance+'fct'}
+                                    value={state.fctBalance + 'fct'}
                                 />
                             </Wrapper>
                         </ListItem>
