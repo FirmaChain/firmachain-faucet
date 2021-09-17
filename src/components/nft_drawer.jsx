@@ -126,7 +126,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
         handleLoadingOpen(true);
         try {
             let nfts = await nftList();
-            setMyNFT(nfts.data);
+            setMyNFT(nfts);
 
             getBalance();
             handleLoadingOpen(false);

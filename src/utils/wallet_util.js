@@ -1,4 +1,4 @@
-import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
+import {FirmaSDK, FirmaConfig, TxMisc} from "@firmachain/firma-js";
 
 import DATA from "../config";
 
@@ -9,6 +9,7 @@ const firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
 const faucetMnemonic = DATA.faucetMnemonic;
 
 export function WalletUtil() {
+
     const state = useSelector(state => state.walletInfo);
     const SDK = () => {
         return firmaSDK;
@@ -86,7 +87,7 @@ export function WalletUtil() {
 
     const sendToken = async(address, amount, memo) => {
         let wallet = await getCurrentWallet();
-        let send = await firmaSDK.Wallet.send(wallet, address, Number(amount), memo);
+        let send = await firmaSDK.Wallet.send(wallet, address, Number(amount), new TxMisc(memo));
 
         return send;
     }
@@ -96,7 +97,7 @@ export function WalletUtil() {
         let memo = 'faucet';
 
         let faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
-        let send = await firmaSDK.Wallet.send(faucetWallet, address, Number(FCTAmount), memo);
+        let send = await firmaSDK.Wallet.send(faucetWallet, address, Number(FCTAmount), new TxMisc(memo));
 
         return send;
     }
