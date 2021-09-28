@@ -75,7 +75,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
 
     const state = useSelector(state => state.walletInfo);
 
-    const [nemonic, setNemonic] = useState(state.nemonic);
+    const [mnemonic, setMnemonic] = useState(state.mnemonic);
     const [privateKey, setPrivateKey] = useState(state.privateKey);
     const [address, setAddress] = useState(state.walletAddress);
     const [accountIndex, setAccountIndex] = useState(state.accountIndex);
@@ -112,7 +112,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }
 
     const setWalletInfo = (wallet) => {
-        setNemonic(wallet.nemonic);
+        setMnemonic(wallet.mnemonic);
         setPrivateKey(wallet.privateKey);
         setAddress(wallet.address);
         setBalance(wallet.balance);
@@ -205,7 +205,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         if(isCreate){
             createWallet();
         } else {
-            if(state.nemonic !== ''){
+            if(state.mnemonic !== ''){
                 getWalletData(Number(accountIndex));
             }
         }
@@ -216,7 +216,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
 
     useEffect(() => {
         if(open){
-            setNemonic(state.nemonic);
+            setMnemonic(state.mnemonic);
             setPrivateKey(state.privateKey);
             setAddress(state.walletAddress);
             setBalance(state.fctBalance);
@@ -261,17 +261,17 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                         className={classes.typography_text}
                         variant='body2'
                         >
-                            Nemonic
+                            Mnemonic
                         </Typography>
                         <ListItem>
                             <Wrapper drawer>
                                 <TextField 
                                     className={classes.disabled_textfield}
-                                    onClick={(e)=>handleClipboard(e, 'Nemonic')}
+                                    onClick={(e)=>handleClipboard(e, 'Mnemonic')}
                                     multiline
                                     maxRows={5}
                                     variant="outlined"
-                                    value={nemonic}
+                                    value={mnemonic}
                                     disabled
                                 />
                             </Wrapper>
@@ -311,7 +311,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                         </ListItem>
                         
                         
-                        {state.nemonic !== '' && 
+                        {state.mnemonic !== '' && 
                             <>
                             <ListItem>
                                 <Wrapper style={{display: 'flex', justifyContent: 'right'}}>

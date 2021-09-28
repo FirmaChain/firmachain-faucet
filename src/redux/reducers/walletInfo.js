@@ -1,6 +1,6 @@
 const initState ={
     walletExist: false,
-    nemonic: '',
+    mnemonic: '',
     walletAddress: '',
     privateKey: '',
     accountIndex: '0',
@@ -14,10 +14,10 @@ const reducer = (state = initState, action) => {
             ...state, 
             walletExist: action.payload,
         }
-        case "NEMONIC" : 
+        case "MNEMONIC" : 
         return{
             ...state, 
-            nemonic: action.payload,
+            mnemonic: action.payload,
         }
         case "WALLET_ADDRESS" : 
         return{

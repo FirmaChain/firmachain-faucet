@@ -276,7 +276,7 @@ export default function Main() {
         if(resultLog){
             setResultLog(null);
         }
-    }, [walletState.nemonic, walletState.privateKey, walletState.walletAddress])
+    }, [walletState.mnemonic, walletState.privateKey, walletState.walletAddress])
 
     return (
         <>

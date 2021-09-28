@@ -26,7 +26,7 @@ npm start
 
 ```javascript
 var DATA = {
-    faucetMnemonic : "FAUCET NEMONIC"
+    faucetMnemonic : "FAUCET MNEMONIC"
 }
 
 export default DATA
@@ -39,7 +39,7 @@ Add site_key to config.js (reCaptchaSiteKey)
 
 ```javascript
 var DATA = {
-    faucetMnemonic : "FAUCET NEMONIC",
+    faucetMnemonic : "FAUCET MNEMONIC",
     reCaptchaSiteKey : "RECAPCHA SITE KEY"
 }
 

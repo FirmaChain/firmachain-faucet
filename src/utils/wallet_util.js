@@ -29,7 +29,7 @@ export function WalletUtil() {
     const recoverWallet = async(data, type) => {
         let wallet;
         switch (type) {
-            case 'nemonic':
+            case 'mnemonic':
                 wallet = await SDK().Wallet.fromMnemonic(data);
                 break;
             case 'privatekey':
@@ -43,18 +43,18 @@ export function WalletUtil() {
     }
 
     const organizeWallet = async(wallet) => {
-        let _nemonic = await wallet.getMnemonic();
+        let _mnemonic = await wallet.getMnemonic();
         let _privateKey = await wallet.getPrivateKey();
         let _address = await wallet.getAddress();
         let _balance = await wallet.getBalance();
 
-        WalletInfoActions.setNemonic(_nemonic);
+        WalletInfoActions.setNemonic(_mnemonic);
         WalletInfoActions.setPrivateKey(_privateKey);
         WalletInfoActions.setWalletAddress(_address);
         WalletInfoActions.setFctBalance(getFCTStringFromUFCT(_balance));
 
         const organizedWallet = {
-            nemonic: _nemonic,
+            mnemonic: _mnemonic,
             privateKey: _privateKey,
             address: _address,
             balance: getFCTStringFromUFCT(_balance),
@@ -64,8 +64,8 @@ export function WalletUtil() {
     }
 
     const getCurrentWallet = async(index = 0) => {
-        if(state.nemonic !== ''){
-            let wallet = await SDK().Wallet.fromMnemonic(state.nemonic, index);
+        if(state.mnemonic !== ''){
+            let wallet = await SDK().Wallet.fromMnemonic(state.mnemonic, index);
             return wallet;
         } else {
             let wallet = await SDK().Wallet.fromPrivateKey(state.privateKey);

@@ -61,7 +61,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
     const classes = useStyles();
     const DrawerTitle = 'Recover';
 
-    const [nemonic, setNemonic] = useState('');
+    const [mnemonic, setMnemonic] = useState('');
     const [privateKey, setPrivateKey] =  useState('');
 
     const [recovery, setRecovery] = useState(false);
@@ -74,8 +74,8 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
         handleWalletDrawer(true);
     }
 
-    const onChangeNemonicInput = (event) => {
-        setNemonic(event.target.value);
+    const onChangeMnemonicInput = (event) => {
+        setMnemonic(event.target.value);
     }
 
     const onChangePrivateKeyInput = (event) => {
@@ -83,14 +83,14 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
     }
 
     const walletRecover = async() => {
-        if(nemonic === '' && privateKey === ''){
-            handleAlertOpen('Please fill in Nemonic or Privete key', 5000, 'error');
+        if(mnemonic === '' && privateKey === ''){
+            handleAlertOpen('Please fill in Mnemonic or Privete key', 5000, 'error');
             return;
         } else {
             try{
                 let wallet;
-                if(nemonic !== ''){
-                    wallet = await recoverWallet(nemonic, 'nemonic');
+                if(mnemonic !== ''){
+                    wallet = await recoverWallet(mnemonic, 'mnemonic');
                 } else {
                     wallet = await recoverWallet(privateKey, 'privatekey');
                 }
@@ -118,7 +118,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
 
     useEffect(() => {
         if(open){
-            setNemonic('');
+            setMnemonic('');
             setPrivateKey('');
         }
     }, [open])
@@ -145,7 +145,7 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
                         className={classes.typography_text}
                         variant='body2'
                         >
-                            Nemonic
+                            Mnemonic
                         </Typography>
                         <ListItem>
                             <TextField 
@@ -153,8 +153,8 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
                                 multiline
                                 maxRows={5}
                                 variant="outlined"
-                                onChange={onChangeNemonicInput}
-                                value={nemonic}
+                                onChange={onChangeMnemonicInput}
+                                value={mnemonic}
                             />
                         </ListItem>
 

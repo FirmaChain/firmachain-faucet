@@ -1,5 +1,5 @@
 const WALLET_EXIST = "WALLET_EXIST";
-const NEMONIC = "NEMONIC";
+const MNEMONIC = "MNEMONIC";
 const WALLET_ADDRESS = "WALLET_ADDRESS";
 const PRIVATE_KEY = "PRIVATE_KEY";
 const ACCOUNT_INDEX = "ACCOUNT_INDEX";
@@ -14,10 +14,10 @@ export const setWalletExist = (boolean) => {
     }
 }
 
-export const setNemonic = (string) => {
+export const setMnemonic = (string) => {
     return (dispatch) => {
         dispatch({
-            type: NEMONIC,
+            type: MNEMONIC,
             payload: string
         })
     }
