@@ -48,7 +48,7 @@ export function WalletUtil() {
         let _address = await wallet.getAddress();
         let _balance = await wallet.getBalance();
 
-        WalletInfoActions.setNemonic(_mnemonic);
+        WalletInfoActions.setMnemonic(_mnemonic);
         WalletInfoActions.setPrivateKey(_privateKey);
         WalletInfoActions.setWalletAddress(_address);
         WalletInfoActions.setFctBalance(getFCTStringFromUFCT(_balance));

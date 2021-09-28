@@ -45,20 +45,29 @@ export default function ListNftSection({open, nfts}) {
     const [myNFTJson, setMyNFTJson] = useState([]);
     const [isFetching, setIsFetching] = useState(false);
     
-    const fetchNFTJson = () => {
+    const fetchNFTJson = async () => {
         setIsFetching(true);
         setMyNFTJson([]);
         
-        nfts.map(async(nft, idx) => {
-            const response = await fetch(nft.tokenURI);
-            const jsonData = await response.json();
-
-            setMyNFTJson(myNFTJson => [...myNFTJson, {
-                index: idx,
-                id: nft.id,
-                json: jsonData,
-                open: false,
-            }])
+        await nfts.map(async(nft, idx) => {
+            try {
+                const response = await fetch(nft.tokenURI);
+                const jsonData = await response.json();
+    
+                const file_res = await fetch(jsonData.path);
+                const file_blob = await file_res.blob();
+                
+                setMyNFTJson(myNFTJson => [...myNFTJson, {
+                    index: idx,
+                    id: nft.id,
+                    type: file_blob.type,
+                    json: jsonData,
+                    open: false,
+                }])
+            } catch (error) {
+                setIsFetching(false);
+                console.log("[error] " + error);
+            }
         })
         setIsFetching(false);
     }
@@ -79,92 +88,97 @@ export default function ListNftSection({open, nfts}) {
 
     return (
         <>
+        <input type="file" id="fileInput" style={{display: 'none'}}/>
         {(!isFetching && myNFTJson.length === nfts.length) &&
             <>
             {myNFTJson.map((nft, index) => {
                 let toeken_uri = nfts[index].tokenURI.split('https://')[1];
                 return (
-                    <>
-                    <ListItem key={'nft-info-'+index}>
-                        <Wrapper style={{backgroundColor: '#444', borderRadius: '3px'}}>
-                            <Wrapper 
-                                style={{width: '100%', display: 'flex', justifyContent: 'space-around', cursor: 'pointer', padding: '0'}}
-                                onClick={()=>openSendSection(index)}
-                            >   
-                                <Wrapper style={{padding: '17px 0'}}>
-                                    <img style={{width: '65px', objectFit: 'contain'}} src={nft.json.path} alt='nft_image'/>
+                    <div key={'nft-info-'+index}>
+                        <ListItem>
+                            <Wrapper style={{backgroundColor: '#444', borderRadius: '3px'}}>
+                                <Wrapper 
+                                    style={{width: '100%', display: 'flex', justifyContent: 'space-around', cursor: 'pointer', padding: '0'}}
+                                    onClick={()=>openSendSection(index)}
+                                >   
+                                    <Wrapper style={{padding: '17px 0'}}>
+                                        <img 
+                                            style={{width: '65px', objectFit: 'contain'}} 
+                                            src={nft.type.includes('image')?nft.json.path:'/assets/file.png'} 
+                                            alt='nft_image'
+                                        />
+                                    </Wrapper>
+                                    <Wrapper style={{width: "200px", textAlign: 'left', padding: '10px 0 0 0'}}>
+                                        <NftCardTextBox>
+                                            <Typography
+                                                className={classes.typography_title}
+                                                variant='caption'
+                                            >
+                                                ID : 
+                                            </Typography>
+                                            <Typography
+                                                className={classes.typography_text}
+                                                variant='body1'
+                                            >
+                                                {nft.id}
+                                            </Typography>
+                                        </NftCardTextBox>
+                                        <NftCardTextBox>
+                                            <Typography
+                                                className={classes.typography_title}
+                                                variant='caption'
+                                            >
+                                                NAME : 
+                                            </Typography>
+                                            <Typography
+                                                className={classes.typography_text}
+                                                variant='body1'
+                                            >
+                                                {nft.json.name}
+                                            </Typography>
+                                        </NftCardTextBox>
+                                        <NftCardTextBox>
+                                            <Typography
+                                                className={classes.typography_title}
+                                                variant='caption'
+                                            >
+                                                DESC : 
+                                            </Typography>
+                                            <Typography
+                                                className={classes.typography_text}
+                                                variant='body1'
+                                            >
+                                                {nft.json.description}
+                                            </Typography>
+                                        </NftCardTextBox>
+                                    </Wrapper>
                                 </Wrapper>
-                                <Wrapper style={{width: "200px", textAlign: 'left', padding: '10px 0 0 0'}}>
+                                <Wrapper style={{float:'right', width: "200px", textAlign: 'left'}}>
                                     <NftCardTextBox>
                                         <Typography
                                             className={classes.typography_title}
                                             variant='caption'
                                         >
-                                            ID : 
+                                            URI : 
                                         </Typography>
                                         <Typography
-                                            className={classes.typography_text}
+                                            className={classes.typography_uri}
                                             variant='body1'
+                                            onClick={()=>openTokenURI(nfts[index].tokenURI)}
                                         >
-                                            {nft.id}
-                                        </Typography>
-                                    </NftCardTextBox>
-                                    <NftCardTextBox>
-                                        <Typography
-                                            className={classes.typography_title}
-                                            variant='caption'
-                                        >
-                                            NAME : 
-                                        </Typography>
-                                        <Typography
-                                            className={classes.typography_text}
-                                            variant='body1'
-                                        >
-                                            {nft.json.name}
-                                        </Typography>
-                                    </NftCardTextBox>
-                                    <NftCardTextBox>
-                                        <Typography
-                                            className={classes.typography_title}
-                                            variant='caption'
-                                        >
-                                            DESC : 
-                                        </Typography>
-                                        <Typography
-                                            className={classes.typography_text}
-                                            variant='body1'
-                                        >
-                                            {nft.json.description}
-                                        </Typography>
+                                            {toeken_uri}
+                                        </Typography>      
                                     </NftCardTextBox>
                                 </Wrapper>
                             </Wrapper>
-                            <Wrapper style={{float:'right', width: "200px", textAlign: 'left'}}>
-                                <NftCardTextBox>
-                                    <Typography
-                                        className={classes.typography_title}
-                                        variant='caption'
-                                    >
-                                        URI : 
-                                    </Typography>
-                                    <Typography
-                                        className={classes.typography_uri}
-                                        variant='body1'
-                                        onClick={()=>openTokenURI(nfts[index].tokenURI)}
-                                    >
-                                        {toeken_uri}
-                                    </Typography>      
-                                </NftCardTextBox>
-                            </Wrapper>
-                        </Wrapper>
-                    </ListItem>
-                    {nft.open &&
-                        <>
-                        <SendNFTSection id={nft.id}/>
-                        <Divider className={classes.divider}/>
-                        </>
-                    }
-                    </>
+                        </ListItem>
+                        {nft.open &&
+                            <>
+                            <SendNFTSection id={nft.id}/>
+                            <Divider className={classes.divider}/>
+                            </>
+                        }
+                    </div>
                 )
             })}
             </>
