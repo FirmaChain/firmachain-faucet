@@ -16,7 +16,7 @@ export function WalletUtil() {
     };
 
     const newWallet = async() => {
-        let wallet = await SDK().Wallet.NewWallet();
+        let wallet = await SDK().Wallet.newWallet();
         return organizeWallet(wallet);
     }
 
