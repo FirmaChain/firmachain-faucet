@@ -1,4 +1,4 @@
-import {FirmaSDK, FirmaConfig, TxMisc} from "@firmachain/firma-js";
+import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 
 import DATA from "../config";
 
@@ -46,7 +46,7 @@ export function WalletUtil() {
         let _mnemonic = await wallet.getMnemonic();
         let _privateKey = await wallet.getPrivateKey();
         let _address = await wallet.getAddress();
-        let _balance = await wallet.getBalance();
+        let _balance = await SDK().Bank.getBalance(_address);
 
         WalletInfoActions.setMnemonic(_mnemonic);
         WalletInfoActions.setPrivateKey(_privateKey);
@@ -74,7 +74,7 @@ export function WalletUtil() {
     }
 
     const getWalletBalance = async() => {
-        let balance = await SDK().Wallet.getBalance(state.walletAddress);
+        let balance = await SDK().Bank.getBalance(state.walletAddress);
         
         return getFCTStringFromUFCT(balance);
     }
@@ -87,7 +87,7 @@ export function WalletUtil() {
 
     const sendToken = async(address, amount, memo) => {
         let wallet = await getCurrentWallet();
-        let send = await firmaSDK.Wallet.send(wallet, address, Number(amount), new TxMisc(memo));
+        let send = await firmaSDK.Bank.send(wallet, address, Number(amount), {memo: memo});
 
         return send;
     }
@@ -97,7 +97,7 @@ export function WalletUtil() {
         let memo = 'faucet';
 
         let faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
-        let send = await firmaSDK.Wallet.send(faucetWallet, address, Number(FCTAmount), new TxMisc(memo));
+        let send = await firmaSDK.Bank.send(faucetWallet, address, Number(FCTAmount), {memo: memo});
 
         return send;
     }

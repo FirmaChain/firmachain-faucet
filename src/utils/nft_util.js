@@ -1,6 +1,5 @@
 import { useSelector } from 'react-redux'
 import { WalletUtil } from "./wallet_util";
-import { TxMisc} from "@firmachain/firma-js";
 
 export function NftUtil() {
     const state = useSelector(state => state.walletInfo);
@@ -26,7 +25,7 @@ export function NftUtil() {
 
     const mintNft = async(url, memo) => {
         let wallet = await getCurrentWallet();
-        let mint = await firmaSDK.Nft.mint(wallet, url, new TxMisc(memo));
+        let mint = await firmaSDK.Nft.mint(wallet, url, {memo: memo});
 
         return mint;
     }
@@ -46,10 +45,10 @@ export function NftUtil() {
         let transfer;
         switch (type) {
             case 'send':
-                transfer = await firmaSDK.Nft.transfer(wallet, address, Number(index), new TxMisc(memo));
+                transfer = await firmaSDK.Nft.transfer(wallet, address, Number(index), {memo: memo});
                 break;
             case 'burn':
-                transfer = await firmaSDK.Nft.burn(wallet, Number(index), new TxMisc(memo))
+                transfer = await firmaSDK.Nft.burn(wallet, Number(index), {memo: memo})
                 break;
             default:
                 break;
