@@ -8,12 +8,9 @@ import { Wrapper } from "../../utils/public_style"
 import { useContext, useState } from "react"
 import { useEffect } from "react"
 
-import { useSelector } from "react-redux"
-
 import { UtilsContext } from "../../screen/main";
 import { TabNFTContext } from "../nft_drawer";
 
-import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 import { NftUtil } from "../../utils/nft_util";
 
 const useStyles = makeStyles((theme) => ({
@@ -113,7 +110,6 @@ export default function SendNFTSection({id}) {
     const NFTTransfer = async() => {
         handleLoadingOpen(true);
         try {
-            // memo 들어가야 함
             let transfer = await transferNft(
                 isSendNFT? 'send' : 'burn',
                 isSendNFT? toAddress : '',

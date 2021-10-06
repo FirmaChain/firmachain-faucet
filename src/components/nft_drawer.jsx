@@ -102,7 +102,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
     const [myNFT, setMyNFT] = useState([]);
 
     // Drawer section open 관련 변수
-    const [openListNFT, setOpenListNFT] = useState(true);
+    const [openListNFT, setOpenListNFT] = useState(false);
     const [openCreateNFT, setOpenCreateNFT] = useState(true);
 
     const handleClipboard = (event, label) => {
@@ -126,7 +126,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
         handleLoadingOpen(true);
         try {
             let nfts = await nftList();
-            setMyNFT(nfts);
+            setMyNFT(nfts.dataList);
 
             getBalance();
             handleLoadingOpen(false);
@@ -146,15 +146,15 @@ export default function NftDrawer({open, handleNftDrawer}) {
     }
 
     useEffect(() => {
-        getAllNFTInfo();
+        if(openListNFT){
+            getAllNFTInfo();
+        }
     }, [openListNFT])
 
     useEffect(() => {
         if(open){
             setOpenCreateNFT(false);
             setOpenListNFT(true);
-    
-            getAllNFTInfo();
         }
     }, [open])
 

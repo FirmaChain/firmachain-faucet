@@ -42,40 +42,51 @@ const useStyles = makeStyles(() => ({
 export default function ListNftSection({open, nfts}) {
     const classes = useStyles();
 
-    const [myNFTJson, setMyNFTJson] = useState([]);
     const [isFetching, setIsFetching] = useState(false);
+    const [myNFT, setMyNFT] = useState([]);
     
     const fetchNFTJson = async () => {
         setIsFetching(true);
-        setMyNFTJson([]);
-        
-        await nfts.map(async(nft, idx) => {
+        setMyNFT([]);
+        for(let i = 0; i <= nfts.length-1; i++){
             try {
+                const nft = nfts[i];
+                const idx = i;
+
                 const response = await fetch(nft.tokenURI);
                 const jsonData = await response.json();
-    
-                const file_res = await fetch(jsonData.path);
-                const file_blob = await file_res.blob();
-                
-                setMyNFTJson(myNFTJson => [...myNFTJson, {
+
+                const path = await checkImageFile(jsonData.path);
+
+                setMyNFT(myNFT => [...myNFT, {
                     index: idx,
                     id: nft.id,
-                    type: file_blob.type,
                     json: jsonData,
+                    path: path,
                     open: false,
                 }])
+                setIsFetching(false);
             } catch (error) {
                 setIsFetching(false);
                 console.log("[error] " + error);
             }
-        })
-        setIsFetching(false);
+        }
+    }
+
+    const checkImageFile = async(path) => {
+        try {
+            const file_res = await fetch(path);
+            const file_blob = await file_res.blob();
+            return file_blob.type.includes('image')? path : '/assets/file.png';
+        } catch (error) {
+            return '/assets/file.png';
+        }
     }
 
     const openSendSection = (index) => {
-        setMyNFTJson(myNFTJson.map(nft => 
-                nft.index === index? {...nft, open: !nft.open}:{...nft, open: false}
-            ));
+        setMyNFT(myNFT.map(nft => 
+            nft.index === index? {...nft, open: !nft.open}:{...nft, open: false}
+        ));
     }
 
     const openTokenURI = (uri) => {
@@ -84,14 +95,14 @@ export default function ListNftSection({open, nfts}) {
 
     useEffect(() => {
         fetchNFTJson();
-    }, [open, nfts])
+    }, [nfts])
 
     return (
         <>
         <input type="file" id="fileInput" style={{display: 'none'}}/>
-        {(!isFetching && myNFTJson.length === nfts.length) &&
+        {(!isFetching && myNFT.length === nfts.length) &&
             <>
-            {myNFTJson.map((nft, index) => {
+            {myNFT.map((nft, index) => {
                 let toeken_uri = nfts[index].tokenURI.split('https://')[1];
                 return (
                     <div key={'nft-info-'+index}>
@@ -104,7 +115,7 @@ export default function ListNftSection({open, nfts}) {
                                     <Wrapper style={{padding: '17px 0'}}>
                                         <img 
                                             style={{width: '65px', objectFit: 'contain'}} 
-                                            src={nft.type.includes('image')?nft.json.path:'/assets/file.png'} 
+                                            src={nft.path} 
                                             alt='nft_image'
                                         />
                                     </Wrapper>
