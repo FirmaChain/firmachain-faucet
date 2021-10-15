@@ -1,12 +1,11 @@
 import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 
-import DATA from "../config";
-
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions";
 
 const firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
-const faucetMnemonic = DATA.faucetMnemonic;
+const faucetMnemonic = process.env.REACT_APP_FAUCET_MNEMONIC;
+
 
 export function WalletUtil() {
 

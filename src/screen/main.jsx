@@ -17,7 +17,6 @@ import { LoadingProgress } from '../components/loading/loading_progress';
 import { Alert } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
 
-import DATA from "../config";
 import { WalletUtil } from '../utils/wallet_util';
 
 export const UtilsContext = React.createContext();
@@ -125,7 +124,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Main() {
-    const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
+    const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITEKEY;
 
     const walletState = useSelector(state => state.walletInfo);
     const NftState = useSelector(state => state.option);

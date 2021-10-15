@@ -18,41 +18,32 @@ The coin provided should be used only for testing purposes. Also, we are not res
 ### 1. Install and Run 
 ```javascript
 npm install
-npm start
+npm start:local
 ```
 </br>
 
-### 2. Create config.js for mnemonic of faucet
+### 2. Create .env.local for mnemonic of faucet
 
 ```javascript
-var DATA = {
-    faucetMnemonic : "FAUCET MNEMONIC"
-}
-
-export default DATA
+FAUCET_MNEMONIC='twist real vast bronze phrase impose million equip claim flight scatter embark nation thumb easy mother walk income talent better lesson horse arrest any'
 ```
 </br>
 
 ### 3. Google reCAPTHA configration
-Add site_key to config.js (reCaptchaSiteKey)
+Add site_key to .env.local (RECAPTCHA_SITEKEY)
 
 
 ```javascript
-var DATA = {
-    faucetMnemonic : "FAUCET MNEMONIC",
-    reCaptchaSiteKey : "RECAPCHA SITE KEY"
-}
-
-export default DATA
+RECAPTCHA_SITEKEY=8as9dfaasAAAKEflsefjJPk8wHPL4yGg6AHzfDh-
 ```
-
+</br>
 
 
 ### # Disable reCAPTCHA
 ```javascript
 
 // line - 129
-const reCaptchaSiteKey = DATA.reCaptchaSiteKey;
+const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITEKEY;
 
 // line - 218
 const activateSendProcess = () => {

@@ -17,6 +17,7 @@
     "copy-to-clipboard": "^3.3.1",
     "ipfs-http-client": "^52.0.3",
     "react": "^17.0.2",
+    "react-app-env": "^1.2.3",
     "react-dom": "^17.0.2",
     "react-google-recaptcha": "^2.1.0",
     "react-redux": "^7.2.4",
@@ -29,9 +30,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "start:local" : "react-app-env --env-file=.env.local start",
+    "start:qa" : "react-app-env --env-file=.env.qa start",
+    "start:live" : "react-app-env --env-file=.env.live start",
   },
   "eslintConfig": {
     "extends": [
