@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { makeStyles } from '@material-ui/core/styles';
 import { Container, ContentsContainer, BackgroundBox, Wrapper, BackgroundBlur, MainBox, LogBox, FooterBox, ReCaptchaBox, MainButtonWrapper, MainTitle, MainButtonBox, LogCardWrapper, LogSendTag, HeaderBox } from '../utils/public_style';
 
-import { WalletInfoActions } from '../redux/actions';
+import { OptionActions, WalletInfoActions } from '../redux/actions';
 
 import WalletDrawer from '../components/wallet_drawer';
 import RecoverDrawer from '../components/recover_drawer';
@@ -202,10 +202,13 @@ export default function Main() {
 
     const handleNetwork = (event) => {
         setNetwork(event.target.value);
+        OptionActions.setNetwork(event.target.value);
         switch (event.target.value) {
             case 'imperium':
+                OptionActions.setSendMode(true);
                 break;
             case 'colosseum':
+                OptionActions.setSendMode(false);
                 break;
             default:
                 break;

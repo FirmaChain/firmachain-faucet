@@ -3,15 +3,18 @@ import {FirmaSDK, FirmaConfig} from "@firmachain/firma-js";
 import { useSelector } from 'react-redux';
 import { WalletInfoActions } from "../redux/actions";
 
-const firmaSDK = new FirmaSDK(FirmaConfig.DevNetConfig);
 const faucetMnemonic = process.env.REACT_APP_FAUCET_MNEMONIC;
 
-
 export function WalletUtil() {
-
+    const network = useSelector(state => state.option.network);
     const state = useSelector(state => state.walletInfo);
     const SDK = () => {
-        return firmaSDK;
+        switch (network) {
+            case 'imperium':
+            return new FirmaSDK(FirmaConfig.DevNetConfig);
+            case 'colosseum':
+            return new FirmaSDK(FirmaConfig.TestNetConfig);
+        }
     };
 
     const newWallet = async() => {
@@ -86,7 +89,7 @@ export function WalletUtil() {
 
     const sendToken = async(address, amount, memo) => {
         let wallet = await getCurrentWallet();
-        let send = await firmaSDK.Bank.send(wallet, address, Number(amount), {memo: memo});
+        let send = await SDK().Bank.send(wallet, address, Number(amount), {memo: memo});
 
         return send;
     }
@@ -96,7 +99,7 @@ export function WalletUtil() {
         let memo = 'faucet';
 
         let faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
-        let send = await firmaSDK.Bank.send(faucetWallet, address, Number(FCTAmount), {memo: memo});
+        let send = await SDK().Bank.send(faucetWallet, address, Number(FCTAmount), {memo: memo});
 
         return send;
     }

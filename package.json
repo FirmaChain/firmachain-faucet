@@ -32,7 +32,7 @@
   "scripts": {
     "start:local" : "react-app-env --env-file=.env.local start",
     "start:qa" : "react-app-env --env-file=.env.qa start",
-    "start:live" : "react-app-env --env-file=.env.live start",
+    "start:live" : "react-app-env --env-file=.env.live start"
   },
   "eslintConfig": {
     "extends": [

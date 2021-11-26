@@ -155,6 +155,9 @@ export default function NftDrawer({open, handleNftDrawer}) {
         if(open){
             setOpenCreateNFT(false);
             setOpenListNFT(true);
+        } else {
+            setOpenCreateNFT(false);
+            setOpenListNFT(false);
         }
     }, [open])
 

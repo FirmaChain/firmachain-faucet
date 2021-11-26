@@ -8,15 +8,13 @@ export function NftUtil() {
         getCurrentWallet,
     } = WalletUtil();
 
-    var firmaSDK = SDK();
-
     const newNft = async(file, name, desc, memo) => {
-        let fileHash = await firmaSDK.Ipfs.addBuffer(file);
-        let fileUrl = await firmaSDK.Ipfs.getURLFromHash(fileHash);
+        let fileHash = await SDK().Ipfs.addBuffer(file);
+        let fileUrl = await SDK().Ipfs.getURLFromHash(fileHash);
 
         let json = '{\"name\" : \"'+ name +'\", \"description\" : \"'+ desc +'\", \"path\" : \"'+ fileUrl +'\"}';
-        let nftJson = await firmaSDK.Ipfs.addJson(json);
-        let jsonUrl = await firmaSDK.Ipfs.getURLFromHash(nftJson);
+        let nftJson = await SDK().Ipfs.addJson(json);
+        let jsonUrl = await SDK().Ipfs.getURLFromHash(nftJson);
         
         let result = await mintNft(jsonUrl, memo);
 
@@ -25,7 +23,7 @@ export function NftUtil() {
 
     const mintNft = async(url, memo) => {
         let wallet = await getCurrentWallet();
-        let mint = await firmaSDK.Nft.mint(wallet, url, {memo: memo});
+        let mint = await SDK().Nft.mint(wallet, url, {memo: memo});
 
         return mint;
     }
@@ -35,7 +33,7 @@ export function NftUtil() {
     }
 
     const nftList = async() => {
-        let nfts = await firmaSDK.Nft.getNftItemAllFromAddress(state.walletAddress);
+        let nfts = await SDK().Nft.getNftItemAllFromAddress(state.walletAddress);
 
         return nfts;
     }
@@ -45,10 +43,10 @@ export function NftUtil() {
         let transfer;
         switch (type) {
             case 'send':
-                transfer = await firmaSDK.Nft.transfer(wallet, address, Number(index), {memo: memo});
+                transfer = await SDK().Nft.transfer(wallet, address, Number(index), {memo: memo});
                 break;
             case 'burn':
-                transfer = await firmaSDK.Nft.burn(wallet, Number(index), {memo: memo})
+                transfer = await SDK().Nft.burn(wallet, Number(index), {memo: memo})
                 break;
             default:
                 break;
@@ -58,7 +56,7 @@ export function NftUtil() {
     }
 
     const getNftBalance = async() => {
-        let balance = await firmaSDK.Nft.getBalanceOf(state.walletAddress);
+        let balance = await SDK().Nft.getBalanceOf(state.walletAddress);
         return balance
     }
 
