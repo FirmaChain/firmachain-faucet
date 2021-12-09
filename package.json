@@ -7,7 +7,7 @@
     "@cosmjs/launchpad": "^0.26.0",
     "@cosmjs/proto-signing": "^0.26.0",
     "@cosmjs/stargate": "^0.26.0",
-    "@firmachain/firma-js": "^0.2.3",
+    "@firmachain/firma-js": "^0.2.14",
     "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
@@ -30,9 +30,9 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start:local" : "react-app-env --env-file=.env.local start",
-    "start:qa" : "react-app-env --env-file=.env.qa start",
-    "start:live" : "react-app-env --env-file=.env.live start"
+    "start:local": "react-app-env --env-file=.env.local start",
+    "start:qa": "react-app-env --env-file=.env.qa start",
+    "start:live": "react-app-env --env-file=.env.live start"
   },
   "eslintConfig": {
     "extends": [
