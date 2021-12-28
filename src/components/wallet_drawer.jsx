@@ -74,7 +74,6 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const DrawerTitle = 'Wallet';
 
     const state = useSelector(state => state.walletInfo);
-    const optionState = useSelector(state => state.option);
 
     const [mnemonic, setMnemonic] = useState(state.mnemonic);
     const [privateKey, setPrivateKey] = useState(state.privateKey);
@@ -339,8 +338,6 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             </ListItem>
                             </>
                         }
-                        {optionState.sendMode &&
-                        <>
                         <Divider className={classes.divider}/>
                         <Typography
                             className={classes.typography_text}
@@ -408,8 +405,6 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                                 onClick={()=>setIsSendToken(true)}
                             >Send</Button>
                         </Wrapper>
-                        </>
-                        }
                     </List>
                 </div>
             </ClickAwayListener>

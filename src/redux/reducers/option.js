@@ -11,11 +11,6 @@ const reducer = (state = initState, action) => {
             ...state, 
             nftMode: action.payload,
         }
-        case "SEND_MODE" : 
-        return{
-            ...state, 
-            sendMode: action.payload,
-        }
         case "NETWORK" : 
         return{
             ...state, 

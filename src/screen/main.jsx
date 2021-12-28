@@ -205,10 +205,10 @@ export default function Main() {
         OptionActions.setNetwork(event.target.value);
         switch (event.target.value) {
             case 'imperium':
-                OptionActions.setSendMode(true);
+                setSendingState(false);
                 break;
             case 'colosseum':
-                OptionActions.setSendMode(false);
+                setSendingState(true);
                 break;
             default:
                 break;

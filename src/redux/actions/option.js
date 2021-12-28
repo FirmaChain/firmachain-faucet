@@ -11,15 +11,6 @@ export const setNftMode = (boolean) => {
     }
 }
 
-export const setSendMode = (boolean) => {
-    return (dispatch) => {
-        dispatch({
-            type: SEND_MODE,
-            payload: boolean
-        })
-    }
-}
-
 export const setNetwork = (boolean) => {
     return (dispatch) => {
         dispatch({
