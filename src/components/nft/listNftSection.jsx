@@ -49,26 +49,41 @@ export default function ListNftSection({open, nfts}) {
         setIsFetching(true);
         setMyNFT([]);
         for(let i = 0; i <= nfts.length-1; i++){
-            try {
-                const nft = nfts[i];
-                const idx = i;
-
-                const response = await fetch(nft.tokenURI);
-                const jsonData = await response.json();
-
-                const path = await checkImageFile(jsonData.path);
-
+            const nft = nfts[i];
+            const idx = i;
+            let fetchWithTokenURI = true;
+            
+            const response = await fetch(nft.tokenURI).then((res) => {
+                return res;
+            }).catch((error) => {
+                console.log(error);
+                fetchWithTokenURI = false;
                 setMyNFT(myNFT => [...myNFT, {
                     index: idx,
                     id: nft.id,
-                    json: jsonData,
-                    path: path,
+                    json: null,
+                    path: '/assets/file.png',
                     open: false,
-                }])
-                setIsFetching(false);
-            } catch (error) {
-                setIsFetching(false);
-                console.log("[error] " + error);
+                }]);
+            });
+
+            if(fetchWithTokenURI){
+                try {
+                    const jsonData = await response.json();
+                    const path = await checkImageFile(jsonData.path);
+    
+                    setMyNFT(myNFT => [...myNFT, {
+                        index: idx,
+                        id: nft.id,
+                        json: jsonData,
+                        path: path,
+                        open: false,
+                    }])
+                    setIsFetching(false);
+                } catch (error) {
+                    setIsFetching(false);
+                    console.log("[error] " + error);
+                }
             }
         }
     }
@@ -95,7 +110,7 @@ export default function ListNftSection({open, nfts}) {
 
     useEffect(() => {
         fetchNFTJson();
-    }, [nfts])
+    }, [nfts]);
 
     return (
         <>
@@ -112,13 +127,15 @@ export default function ListNftSection({open, nfts}) {
                                     style={{width: '100%', display: 'flex', justifyContent: 'space-around', cursor: 'pointer', padding: '0'}}
                                     onClick={()=>openSendSection(index)}
                                 >   
-                                    <Wrapper style={{padding: '17px 0'}}>
-                                        <img 
-                                            style={{width: '65px', objectFit: 'contain'}} 
-                                            src={nft.path} 
-                                            alt='nft_image'
-                                        />
-                                    </Wrapper>
+                                    {nft.path && 
+                                        <Wrapper style={{padding: '17px 0'}}>
+                                            <img 
+                                                style={{width: '65px', objectFit: 'contain'}} 
+                                                src={nft.path} 
+                                                alt='nft_image'
+                                            />
+                                        </Wrapper>
+                                    }
                                     <Wrapper style={{width: "200px", textAlign: 'left', padding: '10px 0 0 0'}}>
                                         <NftCardTextBox>
                                             <Typography
@@ -134,6 +151,8 @@ export default function ListNftSection({open, nfts}) {
                                                 {nft.id}
                                             </Typography>
                                         </NftCardTextBox>
+                                        {nft.json && 
+                                        <>
                                         <NftCardTextBox>
                                             <Typography
                                                 className={classes.typography_title}
@@ -162,6 +181,8 @@ export default function ListNftSection({open, nfts}) {
                                                 {nft.json.description}
                                             </Typography>
                                         </NftCardTextBox>
+                                        </>
+                                        }
                                     </Wrapper>
                                 </Wrapper>
                                 <Wrapper style={{float:'right', width: "200px", textAlign: 'left'}}>

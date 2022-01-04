@@ -138,7 +138,7 @@ export default function Main() {
     const [sendAddressInput, setSendAddressInput] = useState('');
 
     const [network, setNetwork] = useState('imperium');
-    const networkData = ['imperium', 'colosseum'];
+    const networkData = ['imperium'];
 
     const [alertOpen, setAlertOpen] = useState(false);
     const [alertTimer, setAlertTimer] = useState(1000);
@@ -206,9 +206,6 @@ export default function Main() {
         switch (event.target.value) {
             case 'imperium':
                 setSendingState(false);
-                break;
-            case 'colosseum':
-                setSendingState(true);
                 break;
             default:
                 break;

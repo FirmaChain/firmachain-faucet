@@ -12,8 +12,6 @@ export function WalletUtil() {
         switch (network) {
             case 'imperium':
             return new FirmaSDK(FirmaConfig.DevNetConfig);
-            case 'colosseum':
-            return new FirmaSDK(FirmaConfig.TestNetConfig);
         }
     };
 
