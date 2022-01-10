@@ -125,6 +125,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Main() {
     const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITEKEY;
+    const explorerUrl = process.env.REACT_APP_EXPLORER_URL;
 
     const walletState = useSelector(state => state.walletInfo);
     const NftState = useSelector(state => state.option);
@@ -157,11 +158,11 @@ export default function Main() {
     } = WalletUtil();
 
     const moveToExplorer = () => {
-        window.open('https://explorer-devnet.firmachain.org/', '_blank')
+        window.open(explorerUrl, '_blank')
     }
 
     const moveToExplorerTransaction = (hash) => {
-        window.open('https://explorer-devnet.firmachain.org/transactions/'+hash, '_blank')
+        window.open(explorerUrl + '/transactions/'+hash, '_blank')
     }
  
     const handleRecaptcha = (value) => {
