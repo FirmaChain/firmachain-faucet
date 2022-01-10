@@ -4,9 +4,11 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { Wrapper, NftCardTextBox } from "../../utils/public_style"
 
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { useEffect } from "react"
 import SendNFTSection from "./sendNftSection";
+import { NftUtil } from "../../utils/nft_util";
+import { UtilsContext } from "../../screen/main";
 
 const useStyles = makeStyles(() => ({
     typography_title: {
@@ -39,20 +41,44 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export default function ListNftSection({open, nfts}) {
+export default function ListNftSection({open, idList}) {
+    const {
+        getNftItemFromId,
+    } = NftUtil();
+    
+    const { 
+        handleLoadingOpen 
+    } = useContext(UtilsContext);
+
     const classes = useStyles();
 
     const [isFetching, setIsFetching] = useState(false);
+
+    const [nfts, setNfts] = useState([]);
     const [myNFT, setMyNFT] = useState([]);
+
+    const organizeNfts = async () => {
+        handleLoadingOpen(true);
+        let list = [];
+        for(let i = 0; i < idList.length; i++){
+            await getNftItemFromId(idList[i])
+            .then(res => list.push(res))
+            .catch(error => {
+                console.log("[error] " + error);
+                handleLoadingOpen(false)
+            });
+        } 
+        setNfts(list);
+    }
     
     const fetchNFTJson = async () => {
         setIsFetching(true);
         setMyNFT([]);
-        for(let i = 0; i <= nfts.length-1; i++){
+        for(let i = 0; i < nfts.length; i++){
             const nft = nfts[i];
             const idx = i;
             let fetchWithTokenURI = true;
-            
+
             const response = await fetch(nft.tokenURI).then((res) => {
                 return res;
             }).catch((error) => {
@@ -82,6 +108,7 @@ export default function ListNftSection({open, nfts}) {
                     setIsFetching(false);
                 } catch (error) {
                     setIsFetching(false);
+                    handleLoadingOpen(false);
                     console.log("[error] " + error);
                 }
             }
@@ -109,8 +136,16 @@ export default function ListNftSection({open, nfts}) {
     }
 
     useEffect(() => {
+        organizeNfts();
+    }, [idList])
+    
+    useEffect(() => {
         fetchNFTJson();
-    }, [nfts]);
+    }, [nfts])
+
+    useEffect(() => {
+        if(myNFT.length === idList.length) handleLoadingOpen(false);
+    }, [myNFT])
 
     return (
         <>

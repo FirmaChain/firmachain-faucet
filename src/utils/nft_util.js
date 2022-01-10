@@ -32,10 +32,22 @@ export function NftUtil() {
 
     }
 
-    const nftList = async() => {
-        let nfts = await SDK().Nft.getNftItemAllFromAddress(state.walletAddress);
+    const nftIdList = async() => {
+        let paginationKey = "";
+        let nftTotalCount = await SDK().Nft.getNftIdListOfOwner(state.walletAddress).then(res => res.pagination.total);
+        let cycle = Math.ceil(nftTotalCount/100);
+        let idList = [];
+        for(var i=0; i<cycle; i++){
+            await SDK().Nft.getNftIdListOfOwner(state.walletAddress, paginationKey).then(res => {idList.push(...res.nftIdList); paginationKey = res.pagination.next_key;});
+        }
 
-        return nfts;
+        return idList;
+    }
+
+    const getNftItemFromId = async(id) => {
+        let nft = await SDK().Nft.getNftItem(id);
+
+        return nft;
     }
 
     const transferNft = async(type, address = '', index, memo) => {
@@ -62,7 +74,8 @@ export function NftUtil() {
 
     return {
         newNft,
-        nftList,
+        getNftItemFromId,
+        nftIdList,
         getNftBalance,
         transferNft,
     }

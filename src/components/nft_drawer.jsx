@@ -82,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NftDrawer({open, handleNftDrawer}) {
     const {
-        nftList,
+        nftIdList,
     } = NftUtil();
 
     const {
@@ -99,7 +99,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
 
     const state = useSelector(state => state.walletInfo);
 
-    const [myNFT, setMyNFT] = useState([]);
+    const [NFTIdList, setNFTIdList] = useState([]);
 
     // Drawer section open 관련 변수
     const [openListNFT, setOpenListNFT] = useState(false);
@@ -125,8 +125,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
     const getAllNFTInfo = async() => {
         handleLoadingOpen(true);
         try {
-            let nfts = await nftList();
-            setMyNFT(nfts.dataList);
+            await nftIdList().then(res => setNFTIdList(res));
 
             getBalance();
             handleLoadingOpen(false);
@@ -219,8 +218,8 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             </Wrapper>
                         </ListItem>
                         <Divider className={classes.divider}/>
-                        <Wrapper style={{display: myNFT.length > 0 &&'flex'}}>
-                            {myNFT.length > 0 &&
+                        <Wrapper style={{display: NFTIdList.length > 0 &&'flex'}}>
+                            {NFTIdList.length > 0 &&
                                 <Button 
                                     className={classes.button}
                                     variant="contained"
@@ -236,8 +235,8 @@ export default function NftDrawer({open, handleNftDrawer}) {
                         
                         <TabNFTContext.Provider value={{handleNFTButtons, getAllNFTInfo}}>
                             {/* LIST SECTION */}
-                            {(openListNFT && myNFT.length > 0) && 
-                            <ListNFTSection open={openListNFT} nfts={myNFT}/>
+                            {(openListNFT && NFTIdList.length > 0) && 
+                            <ListNFTSection open={openListNFT} idList={NFTIdList}/>
                             }
 
                             {/* CREATE SECTION */}
