@@ -2,6 +2,7 @@ const initState ={
     nftMode: true,
     sendMode: true,
     network: 'imperium',
+    denom: '',
 }
 
 const reducer = (state = initState, action) => {
@@ -15,6 +16,11 @@ const reducer = (state = initState, action) => {
         return{
             ...state, 
             network: action.payload,
+        }
+        case "DENOM" : 
+        return{
+            ...state, 
+            denom: action.payload,
         }
         default :
         return state

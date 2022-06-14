@@ -153,6 +153,7 @@ export default function Main() {
     const [openNftDrawer, setOpenNftDrawer] = useState(false);
 
     const {
+        SDK,
         getWalletBalance,
         sendTokenFromFaucet,
     } = WalletUtil();
@@ -219,7 +220,8 @@ export default function Main() {
             return;
         }
 
-        setOpenRecaptcha(true);
+        // setOpenRecaptcha(true);
+        sendAddress();
     }
 
     const resetSendStatus = () => {
@@ -231,7 +233,6 @@ export default function Main() {
     }
 
     const sendAddress = async() => {
-        // 전송중이면 return
         if(sendingState)return;
         handleLoadingOpen(true);
         setSendingState(true);
@@ -271,6 +272,10 @@ export default function Main() {
     const handleNftDrawer = (open) => {
         setOpenNftDrawer(open);
     }
+
+    useEffect(() => {
+        OptionActions.setDemon(SDK().Config.denom);
+    }, [SDK().Config.denom])
 
     useEffect(() => {
         if(resultLog){

@@ -9,7 +9,7 @@ import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
-import React, { useContext, useState } from "react"
+import React, { useContext, useMemo, useState } from "react"
 import { useEffect } from "react"
 
 import { useSelector } from "react-redux"
@@ -97,9 +97,17 @@ export default function NftDrawer({open, handleNftDrawer}) {
     const classes = useStyles();
     const DrawerTitle = 'NFT';
 
-    const state = useSelector(state => state.walletInfo);
+    const {walletInfo, option} = useSelector(state => state);
 
     const [NFTIdList, setNFTIdList] = useState([]);
+
+    const denom = useMemo(() => {
+        let value = "";
+        if(option.denom.length > 0){
+            value = option.denom.substr(1, option.denom.length);
+        }
+        return value;
+    }, [option.denom])
 
     // Drawer section open 관련 변수
     const [openListNFT, setOpenListNFT] = useState(false);
@@ -197,7 +205,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                                 className={classes.disabled_textfield}
                                 onClick={(e)=>handleClipboard(e, 'Wallet Address')}
                                 variant="outlined"
-                                value={state.walletAddress}
+                                value={walletInfo.walletAddress}
                                 disabled
                             />
                         </ListItem>
@@ -205,7 +213,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                             className={classes.typography_text}
                             variant='body2'
                         >
-                            FCT Balance
+                            {denom.toUpperCase() + " Balance"}
                         </Typography>
                         <ListItem>
                             <Wrapper drawer>
@@ -213,7 +221,7 @@ export default function NftDrawer({open, handleNftDrawer}) {
                                     className={classes.disabled_textfield}
                                     variant="outlined"
                                     disabled
-                                    value={state.fctBalance + 'fct'}
+                                    value={walletInfo.fctBalance + denom}
                                 />
                             </Wrapper>
                         </ListItem>

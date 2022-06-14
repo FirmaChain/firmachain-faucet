@@ -10,7 +10,7 @@ import RefreshIcon from '@material-ui/icons/Refresh'
 
 import { Wrapper } from "../utils/public_style"
 
-import { useContext, useState } from "react"
+import { useContext, useMemo, useState } from "react"
 import { useEffect } from "react"
 
 import { useSelector } from 'react-redux';
@@ -73,13 +73,13 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const classes = useStyles();
     const DrawerTitle = 'Wallet';
 
-    const state = useSelector(state => state.walletInfo);
+    const {walletInfo, option} = useSelector(state => state);
 
-    const [mnemonic, setMnemonic] = useState(state.mnemonic);
-    const [privateKey, setPrivateKey] = useState(state.privateKey);
-    const [address, setAddress] = useState(state.walletAddress);
-    const [accountIndex, setAccountIndex] = useState(state.accountIndex);
-    const [balance, setBalance] = useState(state.fctBalance);
+    const [mnemonic, setMnemonic] = useState(walletInfo.mnemonic);
+    const [privateKey, setPrivateKey] = useState(walletInfo.privateKey);
+    const [address, setAddress] = useState(walletInfo.walletAddress);
+    const [accountIndex, setAccountIndex] = useState(walletInfo.accountIndex);
+    const [balance, setBalance] = useState(walletInfo.fctBalance);
     
     const [toAddress, setToAddress] = useState('');
     const [amount, setAmount] = useState('');
@@ -87,6 +87,14 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     const [isSendToken, setIsSendToken] = useState(false);
 
     const [isCreate, setIsCreate] = useState(false);
+
+    const denom = useMemo(() => {
+        let value = "";
+        if(option.denom.length > 0){
+            value = option.denom.substr(1, option.denom.length);
+        }
+        return value;
+    }, [option.denom])
 
     // Account Key index 생성
     var Selectindex = [];
@@ -112,10 +120,10 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
     }
 
     const setWalletInfo = (wallet) => {
-        setMnemonic(wallet.mnemonic);
-        setPrivateKey(wallet.privateKey);
-        setAddress(wallet.address);
-        setBalance(wallet.balance);
+        setMnemonic(walletInfo.mnemonic);
+        setPrivateKey(walletInfo.privateKey);
+        setAddress(walletInfo.address);
+        setBalance(walletInfo.balance);
     }
 
     const resetSendStatus = () => {
@@ -205,7 +213,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         if(isCreate){
             createWallet();
         } else {
-            if(state.mnemonic !== ''){
+            if(walletInfo.mnemonic !== ''){
                 getWalletData(Number(accountIndex));
             }
         }
@@ -216,16 +224,15 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
 
     useEffect(() => {
         if(open){
-            setMnemonic(state.mnemonic);
-            setPrivateKey(state.privateKey);
-            setAddress(state.walletAddress);
-            setBalance(state.fctBalance);
-            setAccountIndex(state.accountIndex);
+            setMnemonic(walletInfo.mnemonic);
+            setPrivateKey(walletInfo.privateKey);
+            setAddress(walletInfo.walletAddress);
+            setBalance(walletInfo.fctBalance);
+            setAccountIndex(walletInfo.accountIndex);
         }
     }, [open])
 
     return (
-        <>
         <Drawer anchor={'right'} open={open}>
             <ClickAwayListener onClickAway={closeDrawer}>
                 <div style={{width: '335px', height: '100%', padding: '20px', backgroundColor: '#333', zIndex: '0', overflowY: 'auto'}}>
@@ -311,7 +318,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                         </ListItem>
                         
                         
-                        {state.mnemonic !== '' && 
+                        {walletInfo.mnemonic !== '' && 
                             <>
                             <ListItem>
                                 <Wrapper style={{display: 'flex', justifyContent: 'right'}}>
@@ -343,7 +350,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                             className={classes.typography_text}
                             variant='body2'
                         >
-                            FCT Balance
+                            {denom.toUpperCase() + " Balance"}
                         </Typography>
                         <ListItem>
                             <Wrapper drawer>
@@ -351,7 +358,7 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                                     className={classes.disabled_textfield}
                                     variant="outlined"
                                     disabled
-                                    value={balance+'fct'}
+                                    value={balance+denom}
                                 />
                             </Wrapper>
                         </ListItem>
@@ -409,6 +416,5 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                 </div>
             </ClickAwayListener>
         </Drawer>
-        </>
     )
 }
