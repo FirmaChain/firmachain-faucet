@@ -102,7 +102,7 @@ export default function CreateNFTSection(open) {
     const [nftMemo, setNftMemo] = useState('');
 
     const [isMintNFT, setIsMintNFT] = useState(false);
-    
+
     const onChangeNftName = (event) => {
         setNftName(event.target.value);
     }
@@ -140,10 +140,9 @@ export default function CreateNFTSection(open) {
     };
 
     const mintNFT = async() => {
-        if(nftFile === null || nftName === '' || nftDesc === '') return;
-
+        if(nftFile === null || nftName === "" || nftDesc === "") return;
         handleLoadingOpen(true);
-        
+        setIsMintNFT(true);
         try {
             let result = await newNft(
                 nftFile, 
@@ -169,12 +168,6 @@ export default function CreateNFTSection(open) {
         return inputText;
     }
 
-    useEffect(() => {
-        if(isMintNFT){
-            mintNFT();
-        }
-    }, [isMintNFT])
-    
     return (
         <>
         <Typography
@@ -253,7 +246,7 @@ export default function CreateNFTSection(open) {
             <Button 
                 className={classes.button}
                 variant="contained"
-                onClick={()=>setIsMintNFT(true)}
+                onClick={()=>mintNFT()}
                 disabled={isMintNFT}
             >Create</Button>
         </Wrapper>

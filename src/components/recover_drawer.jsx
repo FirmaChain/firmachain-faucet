@@ -98,10 +98,12 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
                 WalletInfoActions.setWalletExist(true);
 
                 handleAlertOpen('Recovered your wallet', 3000, 'success');
+                setRecovery(false);
                 closeDrawer();
                 openWalletDrawer();
             } catch(error) {
                 console.log("[error] " + error);
+                setRecovery(false);
                 handleAlertOpen(error.message, 3000, 'error');
             }
         }
@@ -110,9 +112,6 @@ export default function RecoverDrawer({open, handleRecoverDrawer, handleWalletDr
     useEffect(() => {
         if(recovery){
             walletRecover();
-        }
-        return () => {
-            setRecovery(false);
         }
     }, [recovery])
 

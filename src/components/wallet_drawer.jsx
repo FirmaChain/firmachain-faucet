@@ -119,11 +119,11 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
         setMemo(event.target.value);
     }
 
-    const setWalletInfo = (wallet) => {
+    const setWalletInfo = () => {
         setMnemonic(walletInfo.mnemonic);
         setPrivateKey(walletInfo.privateKey);
-        setAddress(walletInfo.address);
-        setBalance(walletInfo.balance);
+        setAddress(walletInfo.walletAddress);
+        setBalance(walletInfo.fctBalance);
     }
 
     const resetSendStatus = () => {
@@ -156,8 +156,10 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
             setWalletInfo(wallet)
 
             handleAlertOpen('Created your wallet', 3000, 'success');
+            setIsCreate(false);
         } catch (error) {
             console.log("[error] " + error);
+            setIsCreate(false);
             handleAlertOpen(error.message, 5000, 'error');
         }
     }
@@ -217,17 +219,11 @@ export default function WalletDrawer({open, handleWalletDrawer}) {
                 getWalletData(Number(accountIndex));
             }
         }
-        return () => {
-            setIsCreate(false);
-        }
     }, [isCreate, accountIndex])
 
     useEffect(() => {
         if(open){
-            setMnemonic(walletInfo.mnemonic);
-            setPrivateKey(walletInfo.privateKey);
-            setAddress(walletInfo.walletAddress);
-            setBalance(walletInfo.fctBalance);
+            setWalletInfo();
             setAccountIndex(walletInfo.accountIndex);
         }
     }, [open])
