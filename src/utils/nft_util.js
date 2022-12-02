@@ -22,7 +22,7 @@ export function NftUtil() {
     }
 
     const mintNft = async(url, memo) => {
-        let wallet = await getCurrentWallet();
+        let wallet = await getCurrentWallet(state.accountIndex);
         let mint = await SDK().Nft.mint(wallet, url, {memo: memo});
 
         return mint;
