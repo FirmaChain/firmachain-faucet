@@ -16,6 +16,7 @@
 .env.dev
 .env.qa
 .env.live
+.env.testnet
 .env.local
 .env.development.local
 .env.test.local
