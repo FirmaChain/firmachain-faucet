@@ -247,7 +247,7 @@ export default function Main() {
     }
 
     setOpenRecaptcha(true);
-    sendAddress();
+    // sendAddress();
   };
 
   const resetSendStatus = () => {
