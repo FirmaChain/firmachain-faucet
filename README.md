@@ -4,7 +4,7 @@
 
 
 
-Website : https://faucet-devnet.firmachain.org/
+Website : https://faucet-testnet.firmachain.dev/
 
 FirmaChain Faucet is a web service to obtain coins in testnet and devnet environments. 
 
