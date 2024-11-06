@@ -1,8 +1,9 @@
-import { useSelector } from 'react-redux';
 import { WalletUtil } from './wallet_util';
+import useWallet from '@/store/useWallet';
 
 export function NftUtil() {
-	const state = useSelector((state: any) => state.walletInfo);
+	const walletInfo = useWallet();
+
 	const { SDK, getCurrentWallet } = WalletUtil();
 
 	const newNft = async (file: any, name: string, desc: string, memo: string) => {
@@ -19,7 +20,7 @@ export function NftUtil() {
 	};
 
 	const mintNft = async (url: string, memo: string) => {
-		let wallet = await getCurrentWallet(state.accountIndex);
+		let wallet = await getCurrentWallet(walletInfo.accountIndex);
 		let mint = await SDK().Nft.mint(wallet, url, { memo: memo });
 
 		return mint;
@@ -30,13 +31,13 @@ export function NftUtil() {
 	const nftIdList = async () => {
 		let paginationKey = '';
 		let nftTotalCount = await SDK()
-			.Nft.getNftIdListOfOwner(state.walletAddress)
+			.Nft.getNftIdListOfOwner(walletInfo.walletAddress)
 			.then((res) => res.pagination.total);
 		let cycle = Math.ceil(nftTotalCount / 100);
 		let idList: string[] = [];
 		for (var i = 0; i < cycle; i++) {
 			await SDK()
-				.Nft.getNftIdListOfOwner(state.walletAddress, paginationKey)
+				.Nft.getNftIdListOfOwner(walletInfo.walletAddress, paginationKey)
 				.then((res) => {
 					idList.push(...res.nftIdList);
 					paginationKey = res.pagination.next_key;
@@ -52,9 +53,10 @@ export function NftUtil() {
 		return nft;
 	};
 
-	const transferNft = async (type: string, address = '', index: string, memo: string) => {
-		let wallet = await getCurrentWallet();
+	const transferNft = async (type: string, address = '', index: string, memo: string, walletIndex: number) => {
+		let wallet = await getCurrentWallet(walletIndex);
 		let transfer;
+
 		switch (type) {
 			case 'send':
 				transfer = await SDK().Nft.transfer(wallet, address, index, {
@@ -72,7 +74,7 @@ export function NftUtil() {
 	};
 
 	const getNftBalance = async () => {
-		let balance = await SDK().Nft.getBalanceOf(state.walletAddress);
+		let balance = await SDK().Nft.getBalanceOf(walletInfo.walletAddress);
 		return balance;
 	};
 

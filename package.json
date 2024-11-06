@@ -13,13 +13,10 @@
 		"react-dom": "^18.3.1",
 		"react-google-recaptcha": "^3.1.0",
 		"react-json-tree": "^0.19.0",
-		"react-redux": "^7.2.4",
 		"react-scripts": "^5.0.1",
-		"redux-devtools-extension": "^2.13.9",
-		"redux-persist": "^6.0.0",
-		"redux-thunk": "^2.3.0",
 		"styled-components": "^6.1.13",
-		"web-vitals": "^1.0.1"
+		"web-vitals": "^1.0.1",
+		"zustand": "^5.0.1"
 	},
 	"scripts": {
 		"start-testnet": "env-cmd -f .env.testnet craco start",

@@ -1,17 +1,16 @@
 import { ListItem } from '@mui/material';
-
-import { Wrapper } from '../../utils/public_style';
-
+import { Wrapper } from '@/utils/public_style';
 import { ChangeEvent, useState } from 'react';
 import { useEffect } from 'react';
-
-import { NftUtil } from '../../utils/nft_util';
-import { useTabTableContext } from '../../context/tabTableContext';
-import { useUtilContext } from '../../context/utilContext';
+import { NftUtil } from '@/utils/nft_util';
+import { useTabTableContext } from '@/context/tabTableContext';
+import { useUtilContext } from '@/context/utilContext';
 import { DisabledTextField, StyledButton, StyledTypo } from '../muiComponents';
+import useWallet from '@/store/useWallet';
 
 export default function SendNFTSection({ id }: { id: string }) {
 	const { getAllNFTInfo } = useTabTableContext();
+	const walletInfo = useWallet();
 
 	const { transferNft } = NftUtil();
 
@@ -42,7 +41,7 @@ export default function SendNFTSection({ id }: { id: string }) {
 	const NFTTransfer = async () => {
 		handleLoadingOpen(true);
 		try {
-			let transfer = await transferNft(isSendNFT ? 'send' : 'burn', isSendNFT ? toAddress : '', NftIdIndex, memo);
+			let transfer = await transferNft(isSendNFT ? 'send' : 'burn', isSendNFT ? toAddress : '', NftIdIndex, memo, walletInfo.accountIndex);
 
 			getAllNFTInfo();
 			resetTransferStatus();

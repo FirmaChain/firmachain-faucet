@@ -1,10 +1,10 @@
 import { IconButton, ListItem } from '@mui/material';
 import FileIcon from '@mui/icons-material/AttachFile';
-import { Wrapper } from '../../utils/public_style';
+import { Wrapper } from '@/utils/public_style';
 import { ChangeEvent, useState } from 'react';
-import { NftUtil } from '../../utils/nft_util';
-import { useTabTableContext } from '../../context/tabTableContext';
-import { useUtilContext } from '../../context/utilContext';
+import { NftUtil } from '@/utils/nft_util';
+import { useTabTableContext } from '@/context/tabTableContext';
+import { useUtilContext } from '@/context/utilContext';
 import { AttachTextField, DisabledTextField, SectionPaper, StyledButton, StyledTypo, SubTypo, VerticalDivider } from '../muiComponents';
 
 export default function CreateNFTSection({ open }: { open: boolean }) {
@@ -41,21 +41,11 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 		const reader = new FileReader();
 
 		if (event.target.files === null) {
-			handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
+			handleAlertOpen('Failed to read file', 3000, 'error');
 			return;
 		}
 
-		let file = event.target.files[0];
-		// if (file.size / 1024 / 1024 > 20) {
-		//   // file limit
-		//   handleAlertOpen(
-		//     'File size exceeds the allowable limit of 20MB',
-		//     3000,
-		//     'error'
-		//   );
-		//   // event.target.value = null;
-		//   return;
-		// }
+		const file = event.target.files[0];
 
 		reader.readAsArrayBuffer(file);
 
@@ -63,7 +53,6 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 			if (file.size / 1024 / 1024 > 20) {
 				// file limit
 				handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
-				// event.target.value = null;
 				return;
 			}
 

@@ -1,16 +1,12 @@
 import { ClickAwayListener, List, ListItem, Drawer } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
-import { Wrapper } from '../utils/public_style';
-
+import { Wrapper } from '@/utils/public_style';
 import { ChangeEvent, useState } from 'react';
 import { useEffect } from 'react';
-
-import { WalletInfoActions } from '../redux/actions';
-
-import { WalletUtil } from '../utils/wallet_util';
-import { useUtilContext } from '../context/utilContext';
-import { DisabledTextField, DrawerButton, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
+import { WalletUtil } from '@/utils/wallet_util';
+import { useUtilContext } from '@/context/utilContext';
+import { DisabledTextField, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
+import useWallet from '@/store/useWallet';
 
 export default function RecoverDrawer({
 	open,
@@ -61,7 +57,7 @@ export default function RecoverDrawer({
 					wallet = await recoverWallet(privateKey, 'privatekey');
 				}
 
-				WalletInfoActions.setWalletExist(true);
+				useWallet.getState().setWalletExist(true);
 
 				handleAlertOpen('Recovered your wallet', 3000, 'success');
 				setRecovery(false);

@@ -8,14 +8,14 @@ export const Container = styled.div`
 	overflow-x: hidden;
 `;
 
-export const MainTitle = styled.img<{ banner?: boolean }>`
-	width: ${(props) => (props.banner ? '150px' : '350px')};
-	padding: ${(props) => (props.banner ? '0 0 0 20px' : '0 0 50px 0')};
-	cursor: ${(props) => (props.banner ? 'pointer' : null)};
+export const MainTitle = styled.img<{ $banner?: boolean }>`
+	width: ${(props) => (props.$banner ? '150px' : '350px')};
+	padding: ${(props) => (props.$banner ? '0 0 0 20px' : '0 0 50px 0')};
+	cursor: ${(props) => (props.$banner ? 'pointer' : null)};
 
 	@media (max-width: 770px) {
-		width: ${(props) => (props.banner ? '100px' : '280px')};
-		padding: ${(props) => (props.banner ? '0 0 0 20px' : '50px 0 10px 0')};
+		width: ${(props) => (props.$banner ? '100px' : '280px')};
+		padding: ${(props) => (props.$banner ? '0 0 0 20px' : '50px 0 10px 0')};
 	}
 `;
 
@@ -78,7 +78,7 @@ export const NetworkBox = styled.div`
 
 export const LogBox = styled.div`
 	max-width: 600px;
-	padding: 50px 10px 80px 10px;
+	padding: 50px 10px 160px 10px;
 	position: absolute;
 	top: 60vh;
 	@media (max-width: 770px) {

@@ -19,21 +19,14 @@ import {
 	LogCardWrapper,
 	LogSendTag,
 	HeaderBox,
-} from '../utils/public_style';
-
-import { OptionActions, WalletInfoActions } from '../redux/actions';
-
-import WalletDrawer from '../components/wallet_drawer';
-import RecoverDrawer from '../components/recover_drawer';
-import NftDrawer from '../components/nft_drawer';
-
-import { LoadingProgress } from '../components/loading/loading_progress';
-
-import { useSelector } from 'react-redux';
-
-import { WalletUtil } from '../utils/wallet_util';
-import { TabTableProvider } from '../context/tabTableContext';
-import { useUtilContext } from '../context/utilContext';
+} from '@/utils/public_style';
+import WalletDrawer from '@/components/wallet_drawer';
+import RecoverDrawer from '@/components/recover_drawer';
+import NftDrawer from '@/components/nft_drawer';
+import { LoadingProgress } from '@/components/loading/loading_progress';
+import { WalletUtil } from '@/utils/wallet_util';
+import { TabTableProvider } from '@/context/tabTableContext';
+import { useUtilContext } from '@/context/utilContext';
 import {
 	MainButton,
 	MainCard,
@@ -44,8 +37,9 @@ import {
 	MainNetworkSelect,
 	MainPaper,
 	VerticalDivider,
-} from '../components/muiComponents';
-import JsonViewer from '../components/jsonViewer/jsonViewer';
+} from '@/components/muiComponents';
+import JsonViewer from '@/components/jsonViewer/jsonViewer';
+import useWallet from '@/store/useWallet';
 
 interface ResultLog {
 	code: string;
@@ -68,23 +62,9 @@ export default function Main() {
 
 	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
 
-	const walletState = useSelector((state: any) => state.walletInfo);
-	const NftState = useSelector((state: any) => state.option);
+	const walletInfo = useWallet();
 
-	const {
-		alertMessage,
-		setAlertMessage,
-		alertTimer,
-		setAlertTimer,
-		alertType,
-		setAlertType,
-		alertOpen,
-		setAlertOpen,
-		isLoading,
-		setIsLoading,
-		handleAlertOpen,
-		handleLoadingOpen,
-	} = useUtilContext();
+	const { alertMessage, alertTimer, alertType, alertOpen, setAlertOpen, isLoading, handleAlertOpen, handleLoadingOpen } = useUtilContext();
 
 	const [openRecaptcha, setOpenRecaptcha] = useState(false);
 
@@ -137,7 +117,7 @@ export default function Main() {
 
 	const handleNetwork = (event: any) => {
 		setNetwork(event.target.value);
-		OptionActions.setNetwork(event.target.value);
+
 		switch (event.target.value) {
 			case 'imperium':
 				setSendingState(false);
@@ -153,7 +133,10 @@ export default function Main() {
 			return;
 		}
 
+		//? Disable this line to hide ReCaptcha
 		setOpenRecaptcha(true);
+
+		//? Enable this line to hide ReCaptcha
 		// sendAddress();
 	};
 
@@ -183,9 +166,9 @@ export default function Main() {
 			});
 			handleAlertClose();
 
-			if (walletState.walletExist) {
+			if (walletInfo.walletExist) {
 				let balance = await getWalletBalance();
-				WalletInfoActions.setFctBalance(balance);
+				useWallet.getState().setFCTBalance(balance);
 			}
 
 			resetSendStatus();
@@ -209,14 +192,10 @@ export default function Main() {
 	};
 
 	useEffect(() => {
-		OptionActions.setDemon(SDK().Config.denom);
-	}, [SDK().Config.denom]);
-
-	useEffect(() => {
 		if (resultLog) {
 			setResultLog(null);
 		}
-	}, [walletState.mnemonic, walletState.privateKey, walletState.walletAddress]);
+	}, [walletInfo.mnemonic, walletInfo.privateKey, walletInfo.walletAddress]);
 
 	return (
 		<>
@@ -230,8 +209,13 @@ export default function Main() {
 
 				<ContentsContainer>
 					<HeaderBox>
-						<MainTitle banner src="/assets/firma_chain_title.svg" onClick={() => moveToExplorer()} />
-						<MainNetworkSelect value={network} onChange={(e) => handleNetwork(e)} MenuProps={{ disablePortal: true }}>
+						<MainTitle $banner src="/assets/firma_chain_title.svg" onClick={() => moveToExplorer()} />
+						<MainNetworkSelect
+							value={network}
+							onChange={(e) => handleNetwork(e)}
+							style={{ textAlign: 'left', paddingLeft: '12px' }}
+							MenuProps={{ disablePortal: true }}
+						>
 							{networkData.map((network) => {
 								return (
 									<MenuItem value={network} key={'select-option-' + network}>
@@ -268,10 +252,10 @@ export default function Main() {
 									Recover
 								</MainButton>
 								<MainButton
-									disabled={walletState.walletAddress === ''}
+									disabled={walletInfo.walletAddress === ''}
 									variant="contained"
 									style={{
-										backgroundColor: walletState.walletAddress === '' ? '#a0a0a0' : '#e0e0e0',
+										backgroundColor: walletInfo.walletAddress === '' ? '#a0a0a0' : '#e0e0e0',
 									}}
 									onClick={() => setOpenNftDrawer(true)}
 								>
@@ -331,27 +315,26 @@ export default function Main() {
 							</MainCard>
 						</LogBox>
 					)}
-
-					<FooterBox>
-						<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2023</MainFooterTypo>
-						<MainFooterTypo variant="body1">
-							Maintained By{' '}
-							<a style={{ color: '#1D86FF' }} href="https://firmachain.org/">
-								FIRMACHAIN
-							</a>
-						</MainFooterTypo>
-					</FooterBox>
 				</ContentsContainer>
+				<FooterBox>
+					<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2023</MainFooterTypo>
+					<MainFooterTypo variant="body1">
+						Maintained By{' '}
+						<a style={{ color: '#1D86FF' }} href="https://firmachain.org/">
+							FIRMACHAIN
+						</a>
+					</MainFooterTypo>
+				</FooterBox>
 			</Container>
 
 			{/* Drawer */}
 			<WalletDrawer open={openWalletDrawer} handleWalletDrawer={handleWalletDrawer} />
 			<RecoverDrawer open={openRecoverDrawer} handleRecoverDrawer={handleRecoverDrawer} handleWalletDrawer={handleWalletDrawer} />
-			{NftState.nftMode && (
-				<TabTableProvider>
-					<NftDrawer open={openNftDrawer} handleNftDrawer={handleNftDrawer} />
-				</TabTableProvider>
-			)}
+			{/* {NftState.nftMode && ( */}
+			<TabTableProvider>
+				<NftDrawer open={openNftDrawer} handleNftDrawer={handleNftDrawer} />
+			</TabTableProvider>
+			{/* )} */}
 
 			{/* Alert */}
 			<Snackbar

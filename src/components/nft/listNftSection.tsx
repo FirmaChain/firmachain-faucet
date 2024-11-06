@@ -1,12 +1,10 @@
 import { ListItem } from '@mui/material';
-
-import { Wrapper, NftCardTextBox } from '../../utils/public_style';
-
+import { Wrapper, NftCardTextBox } from '@/utils/public_style';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import SendNFTSection from './sendNftSection';
-import { NftUtil } from '../../utils/nft_util';
-import { useUtilContext } from '../../context/utilContext';
+import { NftUtil } from '@/utils/nft_util';
+import { useUtilContext } from '@/context/utilContext';
 import { NftItemType } from '@firmachain/firma-js';
 import { StyledDivider, NFTTitleTypo, NFTValueTypo, NFTUriTypo } from '../muiComponents';
 

@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const path = require('path');
 
 const configureWebpack = (webpackConfig, { env, paths }) => {
 	const fallback = webpackConfig.resolve.fallback || {};
@@ -28,6 +29,9 @@ const configureCraco = () => {
 	return {
 		webpack: {
 			configure: configureWebpack,
+			alias: {
+				'@': path.resolve(__dirname, 'src'),
+			},
 		},
 	};
 };

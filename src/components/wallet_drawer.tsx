@@ -1,34 +1,29 @@
 import { ClickAwayListener, SelectChangeEvent, List, ListItem, MenuItem, Drawer } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
 import { Wrapper } from '../utils/public_style';
-
 import { ChangeEvent, useMemo, useState } from 'react';
 import { useEffect } from 'react';
-
-import { useSelector } from 'react-redux';
-import { WalletInfoActions } from '../redux/actions';
-
 import copy from 'copy-to-clipboard';
 import { WalletUtil } from '../utils/wallet_util';
 import { useUtilContext } from '../context/utilContext';
 import { AccountSelect, DisabledTextField, DrawerButton, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
+import useWallet from '@/store/useWallet';
 
 export default function WalletDrawer({ open, handleWalletDrawer }: { open: boolean; handleWalletDrawer: (v: boolean) => void }) {
-	const { sendToken, newWallet, getWallet } = WalletUtil();
+	const { SDK, sendToken, newWallet, getWallet } = WalletUtil();
 
 	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
 
 	const DrawerTitle = 'Wallet';
 
-	const { walletInfo, option }: any = useSelector((state) => state);
+	const walletInfo = useWallet();
 
-	const [mnemonic, setMnemonic] = useState(walletInfo.mnemonic);
-	const [privateKey, setPrivateKey] = useState(walletInfo.privateKey);
-	const [address, setAddress] = useState(walletInfo.walletAddress);
-	const [accountIndex, setAccountIndex] = useState(walletInfo.accountIndex);
-	const [balance, setBalance] = useState(walletInfo.fctBalance);
+	const mnemonic = walletInfo.mnemonic;
+	const privateKey = walletInfo.privateKey;
+	const address = walletInfo.walletAddress;
+	const accountIndex = walletInfo.accountIndex;
+	const balance = walletInfo.fctBalance;
 
 	const [toAddress, setToAddress] = useState('');
 	const [amount, setAmount] = useState('');
@@ -38,12 +33,14 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 	const [isCreate, setIsCreate] = useState(false);
 
 	const denom = useMemo(() => {
-		let value = '';
-		if (option.denom.length > 0) {
-			value = option.denom.substr(1, option.denom.length);
+		const _demon = SDK().Config.denom;
+		let result = '';
+
+		if (_demon.length > 0) {
+			result = _demon.slice(1);
 		}
-		return value;
-	}, [option.denom]);
+		return result;
+	}, [SDK]);
 
 	// Create Account Key index
 	var Selectindex = [];
@@ -53,7 +50,10 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 
 	// Account Key index
 	const onChangeAccountIndex = (event: SelectChangeEvent<unknown>) => {
-		setAccountIndex(event.target.value);
+		//? value type is 'number'
+		console.log(event.target.value);
+
+		useWallet.getState().setAccountIndex(event.target.value as number);
 	};
 
 	const onChangeToAddress = (event: ChangeEvent<HTMLInputElement>) => {
@@ -66,13 +66,6 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 
 	const onChangeMemo = (event: ChangeEvent<HTMLInputElement>) => {
 		setMemo(event.target.value);
-	};
-
-	const setWalletInfo = () => {
-		setMnemonic(walletInfo.mnemonic);
-		setPrivateKey(walletInfo.privateKey);
-		setAddress(walletInfo.walletAddress);
-		setBalance(walletInfo.fctBalance);
 	};
 
 	const resetSendStatus = () => {
@@ -102,8 +95,6 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 	async function createWallet() {
 		try {
 			let wallet = await newWallet();
-			setWalletInfo(/*wallet*/);
-
 			handleAlertOpen('Created your wallet', 3000, 'success');
 			setIsCreate(false);
 		} catch (error: any) {
@@ -113,11 +104,11 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 		}
 	}
 
-	async function getWalletData(idx = 0) {
+	async function getWalletData(idx: number) {
 		handleLoadingOpen(true);
 		try {
 			let wallet = await getWallet(idx);
-			setWalletInfo(/*wallet*/);
+
 			handleLoadingOpen(false);
 		} catch (error: any) {
 			handleLoadingOpen(false);
@@ -138,9 +129,9 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 
 		handleLoadingOpen(true);
 		try {
-			let send = await sendToken(toAddress, amount, memo);
+			let send = await sendToken(toAddress, amount, memo, walletInfo.accountIndex);
 			let wallet = await getWallet(accountIndex);
-			setWalletInfo(/*wallet*/);
+
 			resetSendStatus();
 			handleAlertOpen('Send token success', 3000, 'success');
 		} catch (error: any) {
@@ -157,7 +148,7 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 	}, [isSendToken]);
 
 	useEffect(() => {
-		WalletInfoActions.setAccountIndex(accountIndex);
+		useWallet.getState().setAccountIndex(accountIndex);
 	}, [accountIndex]);
 
 	useEffect(() => {
@@ -172,8 +163,7 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 
 	useEffect(() => {
 		if (open) {
-			setWalletInfo();
-			setAccountIndex(walletInfo.accountIndex);
+			useWallet.getState().setAccountIndex(walletInfo.accountIndex);
 		}
 	}, [open]);
 
@@ -206,7 +196,7 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 							}}
 						>
 							<StyledTypo variant="h5">{DrawerTitle}</StyledTypo>
-							<RefreshIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => getWalletData()} />
+							<RefreshIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => getWalletData(accountIndex)} />
 						</Wrapper>
 						<CloseIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => closeDrawer()} />
 					</Wrapper>

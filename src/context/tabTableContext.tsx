@@ -1,9 +1,8 @@
 import { createContext, useContext, ReactNode, useState } from 'react';
-
-import { NftUtil } from '../utils/nft_util';
-import { WalletUtil } from '../utils/wallet_util';
-import { WalletInfoActions } from '../redux/actions';
+import { NftUtil } from '@/utils/nft_util';
+import { WalletUtil } from '@/utils/wallet_util';
 import { useUtilContext } from './utilContext';
+import useWallet from '@/store/useWallet';
 
 interface TabTableContextProps {
 	openListNFT: boolean;
@@ -38,7 +37,7 @@ export const TabTableProvider = ({ children }: { children: ReactNode }) => {
 
 	const { nftIdList } = NftUtil();
 	const { getWalletBalance } = WalletUtil();
-	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
+	const { handleLoadingOpen } = useUtilContext();
 
 	const handleNFTButtons = (target: string) => {
 		setOpenCreateNFT(target === 'create');
@@ -48,7 +47,8 @@ export const TabTableProvider = ({ children }: { children: ReactNode }) => {
 	const getBalance = async () => {
 		try {
 			let _balance = await getWalletBalance();
-			WalletInfoActions.setFctBalance(_balance);
+
+			useWallet.getState().setFCTBalance(_balance);
 		} catch (error) {
 			console.log('[error] ' + error);
 		}

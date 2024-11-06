@@ -1,22 +1,20 @@
 import { ClickAwayListener, List, ListItem, Drawer } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
-import { Wrapper } from '../utils/public_style';
-
+import { Wrapper } from '@/utils/public_style';
 import { useMemo } from 'react';
 import { useEffect } from 'react';
-
-import { useSelector } from 'react-redux';
 import ListNFTSection from './nft/listNftSection';
 import CreateNFTSection from './nft/createNftSection';
-
 import copy from 'copy-to-clipboard';
-import { useTabTableContext } from '../context/tabTableContext';
-import { useUtilContext } from '../context/utilContext';
+import { useTabTableContext } from '@/context/tabTableContext';
+import { useUtilContext } from '@/context/utilContext';
 import { DisabledTextField, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
+import useWallet from '@/store/useWallet';
+import { WalletUtil } from '@/utils/wallet_util';
 
 export default function NftDrawer({ open, handleNftDrawer }: { open: boolean; handleNftDrawer: (v: boolean) => void }) {
+	const { SDK } = WalletUtil();
 	const { openListNFT, setOpenListNFT, openCreateNFT, setOpenCreateNFT, NFTIdList, getBalance, handleNFTButtons, getAllNFTInfo } =
 		useTabTableContext();
 
@@ -24,15 +22,17 @@ export default function NftDrawer({ open, handleNftDrawer }: { open: boolean; ha
 
 	const DrawerTitle = 'NFT';
 
-	const { walletInfo, option }: any = useSelector((state) => state);
+	const walletInfo = useWallet();
 
 	const denom = useMemo(() => {
-		let value = '';
-		if (option.denom.length > 0) {
-			value = option.denom.substr(1, option.denom.length);
+		const _demon = SDK().Config.denom;
+		let result = '';
+
+		if (_demon.length > 0) {
+			result = _demon.slice(1);
 		}
-		return value;
-	}, [option.denom]);
+		return result;
+	}, [SDK]);
 
 	const handleClipboard = (event: any, label: string) => {
 		if (event.target.value === '' || event.target.value === undefined) {
