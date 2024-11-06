@@ -1,6 +1,4 @@
-import { Divider, Typography } from '@material-ui/core';
-import { ListItem } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { ListItem } from '@mui/material';
 
 import { Wrapper, NftCardTextBox } from '../../utils/public_style';
 
@@ -10,37 +8,7 @@ import SendNFTSection from './sendNftSection';
 import { NftUtil } from '../../utils/nft_util';
 import { useUtilContext } from '../../context/utilContext';
 import { NftItemType } from '@firmachain/firma-js';
-
-const useStyles = makeStyles(() => ({
-	typography_title: {
-		width: '50px',
-		color: '#fff',
-		opacity: '.8',
-		textAlign: 'left',
-	},
-	typography_text: {
-		width: '140px',
-		color: '#fff',
-		textAlign: 'left',
-		paddingRight: '10px',
-		wordBreak: 'break-word',
-	},
-	typography_uri: {
-		width: '140px',
-		textAlign: 'left',
-		paddingRight: '10px',
-		whiteSpace: 'nowrap',
-		overflow: 'hidden',
-		textOverflow: 'ellipsis',
-		cursor: 'pointer',
-		color: 'rgb(29, 134, 255)',
-		textDecoration: 'underline',
-	},
-
-	divider: {
-		backgroundColor: '#fff',
-	},
-}));
+import { StyledDivider, NFTTitleTypo, NFTValueTypo, NFTUriTypo } from '../muiComponents';
 
 interface NftData extends NftItemType {
 	index?: number;
@@ -53,8 +21,6 @@ export default function ListNftSection({ open, idList }: { open: boolean; idList
 	const { getNftItemFromId } = NftUtil();
 
 	const { handleLoadingOpen } = useUtilContext();
-
-	const classes = useStyles();
 
 	const [isFetching, setIsFetching] = useState(false);
 
@@ -196,30 +162,18 @@ export default function ListNftSection({ open, idList }: { open: boolean; idList
 												}}
 											>
 												<NftCardTextBox>
-													<Typography className={classes.typography_title} variant="caption">
-														ID :
-													</Typography>
-													<Typography className={classes.typography_text} variant="body1">
-														{nft.id}
-													</Typography>
+													<NFTTitleTypo variant="caption">ID :</NFTTitleTypo>
+													<NFTValueTypo variant="body1">{nft.id}</NFTValueTypo>
 												</NftCardTextBox>
 												{nft.json && (
 													<>
 														<NftCardTextBox>
-															<Typography className={classes.typography_title} variant="caption">
-																NAME :
-															</Typography>
-															<Typography className={classes.typography_text} variant="body1">
-																{nft.json.name}
-															</Typography>
+															<NFTTitleTypo variant="caption">NAME :</NFTTitleTypo>
+															<NFTValueTypo variant="body1">{nft.json.name}</NFTValueTypo>
 														</NftCardTextBox>
 														<NftCardTextBox>
-															<Typography className={classes.typography_title} variant="caption">
-																DESC :
-															</Typography>
-															<Typography className={classes.typography_text} variant="body1">
-																{nft.json.description}
-															</Typography>
+															<NFTTitleTypo variant="caption">DESC :</NFTTitleTypo>
+															<NFTValueTypo variant="body1">{nft.json.description}</NFTValueTypo>
 														</NftCardTextBox>
 													</>
 												)}
@@ -233,16 +187,10 @@ export default function ListNftSection({ open, idList }: { open: boolean; idList
 											}}
 										>
 											<NftCardTextBox>
-												<Typography className={classes.typography_title} variant="caption">
-													URI :
-												</Typography>
-												<Typography
-													className={classes.typography_uri}
-													variant="body1"
-													onClick={() => openTokenURI(nfts[index].tokenURI)}
-												>
+												<NFTTitleTypo variant="caption">URI :</NFTTitleTypo>
+												<NFTUriTypo variant="body1" onClick={() => openTokenURI(nfts[index].tokenURI)}>
 													{toeken_uri}
-												</Typography>
+												</NFTUriTypo>
 											</NftCardTextBox>
 										</Wrapper>
 									</Wrapper>
@@ -250,7 +198,7 @@ export default function ListNftSection({ open, idList }: { open: boolean; idList
 								{nft.open && (
 									<>
 										<SendNFTSection id={nft.id} />
-										<Divider className={classes.divider} />
+										<StyledDivider />
 									</>
 								)}
 							</div>

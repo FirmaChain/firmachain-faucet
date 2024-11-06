@@ -1,7 +1,4 @@
-import { Button } from '@material-ui/core';
-import { TextField, Typography } from '@material-ui/core';
-import { ListItem } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { ListItem } from '@mui/material';
 
 import { Wrapper } from '../../utils/public_style';
 
@@ -11,62 +8,7 @@ import { useEffect } from 'react';
 import { NftUtil } from '../../utils/nft_util';
 import { useTabTableContext } from '../../context/tabTableContext';
 import { useUtilContext } from '../../context/utilContext';
-
-const useStyles = makeStyles((theme) => ({
-	paper: {
-		display: 'flex',
-		alignItems: 'center',
-		width: '100%',
-		height: '50px',
-	},
-
-	divider: {
-		backgroundColor: '#fff',
-	},
-	vertical_divider: {
-		height: 28,
-		margin: 4,
-	},
-
-	// text field
-	disabled_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	active_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		marginBottom: '10px',
-	},
-	attach_textfield: {
-		fontSize: '12px',
-		width: '100%',
-		padding: '0 10px',
-	},
-
-	typography_text: {
-		padding: '10px',
-		color: '#fff',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	button: {
-		backgroundColor: '#fff',
-		width: '90%',
-		padding: '10px',
-		margin: '0 5px',
-	},
-
-	account_select: {
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		width: '50px',
-	},
-}));
+import { DisabledTextField, StyledButton, StyledTypo } from '../muiComponents';
 
 export default function SendNFTSection({ id }: { id: string }) {
 	const { getAllNFTInfo } = useTabTableContext();
@@ -74,8 +16,6 @@ export default function SendNFTSection({ id }: { id: string }) {
 	const { transferNft } = NftUtil();
 
 	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
-
-	const classes = useStyles();
 
 	const [toAddress, setToAddress] = useState('');
 	const [memo, setMemo] = useState('');
@@ -120,28 +60,24 @@ export default function SendNFTSection({ id }: { id: string }) {
 
 	return (
 		<>
-			<Typography className={classes.typography_text} variant="body2">
-				To Address
-			</Typography>
+			<StyledTypo variant="body2">To Address</StyledTypo>
 			<ListItem>
-				<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeToAddress} value={toAddress} />
+				<DisabledTextField variant="outlined" onChange={onChangeToAddress} value={toAddress} />
 			</ListItem>
-			<Typography className={classes.typography_text} variant="body2">
-				Memo
-			</Typography>
+			<StyledTypo variant="body2">Memo</StyledTypo>
 			<ListItem>
-				<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeMemo} value={memo} />
+				<DisabledTextField variant="outlined" onChange={onChangeMemo} value={memo} />
 			</ListItem>
 			<Wrapper>
-				<Button className={classes.button} variant="contained" disabled={isSendNFT || isBurnNFT} onClick={() => setIsSendNFT(true)}>
+				<StyledButton variant="contained" disabled={isSendNFT || isBurnNFT} onClick={() => setIsSendNFT(true)}>
 					Send
-				</Button>
+				</StyledButton>
 			</Wrapper>
 
 			<Wrapper>
-				<Button className={classes.button} variant="contained" disabled={isSendNFT || isBurnNFT} onClick={() => setIsBurnNFT(true)}>
+				<StyledButton variant="contained" disabled={isSendNFT || isBurnNFT} onClick={() => setIsBurnNFT(true)}>
 					Burn
-				</Button>
+				</StyledButton>
 			</Wrapper>
 		</>
 	);

@@ -1,12 +1,6 @@
-import { Button, ClickAwayListener } from '@material-ui/core';
-import { TextField, Typography } from '@material-ui/core';
-import { List, ListItem } from '@material-ui/core';
-import { Select, MenuItem } from '@material-ui/core';
-import { Divider } from '@material-ui/core';
-import { Drawer } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import CloseIcon from '@material-ui/icons/Close';
-import RefreshIcon from '@material-ui/icons/Refresh';
+import { ClickAwayListener, SelectChangeEvent, List, ListItem, MenuItem, Drawer } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { Wrapper } from '../utils/public_style';
 
@@ -19,52 +13,13 @@ import { WalletInfoActions } from '../redux/actions';
 import copy from 'copy-to-clipboard';
 import { WalletUtil } from '../utils/wallet_util';
 import { useUtilContext } from '../context/utilContext';
-
-const useStyles = makeStyles((theme) => ({
-	divider: {
-		backgroundColor: '#fff',
-	},
-
-	// text field
-	disabled_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	active_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		marginBottom: '10px',
-	},
-
-	account_select: {
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		width: '50px',
-	},
-
-	typography_text: {
-		padding: '10px',
-		color: '#fff',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	button: {
-		backgroundColor: '#fff',
-		width: '90%',
-		padding: '10px',
-	},
-}));
+import { AccountSelect, DisabledTextField, DrawerButton, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
 
 export default function WalletDrawer({ open, handleWalletDrawer }: { open: boolean; handleWalletDrawer: (v: boolean) => void }) {
 	const { sendToken, newWallet, getWallet } = WalletUtil();
 
 	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
 
-	const classes = useStyles();
 	const DrawerTitle = 'Wallet';
 
 	const { walletInfo, option }: any = useSelector((state) => state);
@@ -97,7 +52,7 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 	}
 
 	// Account Key index
-	const onChangeAccountIndex = (event: ChangeEvent<{ name?: string; value: unknown }>) => {
+	const onChangeAccountIndex = (event: SelectChangeEvent<unknown>) => {
 		setAccountIndex(event.target.value);
 	};
 
@@ -250,28 +205,23 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 								alignItems: 'center',
 							}}
 						>
-							<Typography className={classes.typography_text} variant="h5">
-								{DrawerTitle}
-							</Typography>
+							<StyledTypo variant="h5">{DrawerTitle}</StyledTypo>
 							<RefreshIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => getWalletData()} />
 						</Wrapper>
 						<CloseIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => closeDrawer()} />
 					</Wrapper>
-					<Divider className={classes.divider} />
+					<StyledDivider />
 					<Wrapper>
-						<Button className={classes.button} variant="contained" onClick={() => onClickCreateWallet()}>
+						<StyledButton variant="contained" onClick={() => onClickCreateWallet()}>
 							Create New Wallet
-						</Button>
+						</StyledButton>
 					</Wrapper>
 
 					<List>
-						<Typography className={classes.typography_text} variant="body2">
-							Mnemonic
-						</Typography>
+						<StyledTypo variant="body2">Mnemonic</StyledTypo>
 						<ListItem>
 							<Wrapper drawer>
-								<TextField
-									className={classes.disabled_textfield}
+								<DisabledTextField
 									onClick={(e) => handleClipboard(e, 'Mnemonic')}
 									multiline
 									maxRows={5}
@@ -281,13 +231,10 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 								/>
 							</Wrapper>
 						</ListItem>
-						<Typography className={classes.typography_text} variant="body2">
-							Private Key
-						</Typography>
+						<StyledTypo variant="body2">Private Key</StyledTypo>
 						<ListItem>
 							<Wrapper drawer>
-								<TextField
-									className={classes.disabled_textfield}
+								<DisabledTextField
 									onClick={(e) => handleClipboard(e, 'Private Key')}
 									variant="outlined"
 									value={privateKey}
@@ -296,28 +243,19 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 							</Wrapper>
 						</ListItem>
 
-						<Typography className={classes.typography_text} variant="body2">
-							Wallet Address
-						</Typography>
+						<StyledTypo variant="body2">Wallet Address</StyledTypo>
 						<ListItem>
-							<TextField
-								className={classes.disabled_textfield}
-								onClick={(e) => handleClipboard(e, 'Wallet Address')}
-								variant="outlined"
-								value={address}
-								disabled
-							/>
+							<DisabledTextField onClick={(e) => handleClipboard(e, 'Wallet Address')} variant="outlined" value={address} disabled />
 						</ListItem>
 
 						{walletInfo.mnemonic !== '' && (
 							<>
 								<ListItem>
 									<Wrapper style={{ display: 'flex', justifyContent: 'right' }}>
-										<Typography className={classes.typography_text} style={{ opacity: '.8' }} variant="body2">
+										<StyledTypo style={{ opacity: '.8' }} variant="body2">
 											Select your account index
-										</Typography>
-										<Select
-											className={classes.account_select}
+										</StyledTypo>
+										<AccountSelect
 											value={Number(accountIndex)}
 											onChange={(e) => onChangeAccountIndex(e)}
 											MenuProps={{ disablePortal: true }}
@@ -329,43 +267,35 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 													</MenuItem>
 												);
 											})}
-										</Select>
+										</AccountSelect>
 									</Wrapper>
 								</ListItem>
 							</>
 						)}
-						<Divider className={classes.divider} />
-						<Typography className={classes.typography_text} variant="body2">
-							{denom.toUpperCase() + ' Balance'}
-						</Typography>
+						<StyledDivider />
+						<StyledTypo variant="body2">{denom.toUpperCase() + ' Balance'}</StyledTypo>
 						<ListItem>
 							<Wrapper drawer>
-								<TextField className={classes.disabled_textfield} variant="outlined" disabled value={balance + denom} />
+								<DisabledTextField variant="outlined" disabled value={balance + denom} />
 							</Wrapper>
 						</ListItem>
 
-						<Typography className={classes.typography_text} variant="body2">
-							To Address
-						</Typography>
+						<StyledTypo variant="body2">To Address</StyledTypo>
 						<ListItem>
-							<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeToAddress} value={toAddress} />
+							<DisabledTextField variant="outlined" onChange={onChangeToAddress} value={toAddress} />
 						</ListItem>
-						<Typography className={classes.typography_text} variant="body2">
-							Amount
-						</Typography>
+						<StyledTypo variant="body2">Amount</StyledTypo>
 						<ListItem>
-							<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeAmount} value={amount} />
+							<DisabledTextField variant="outlined" onChange={onChangeAmount} value={amount} />
 						</ListItem>
-						<Typography className={classes.typography_text} variant="body2">
-							Memo
-						</Typography>
+						<StyledTypo variant="body2">Memo</StyledTypo>
 						<ListItem>
-							<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeMemo} value={memo} />
+							<DisabledTextField variant="outlined" onChange={onChangeMemo} value={memo} />
 						</ListItem>
 						<Wrapper>
-							<Button className={classes.button} variant="contained" onClick={() => setIsSendToken(true)}>
+							<StyledButton variant="contained" onClick={() => setIsSendToken(true)}>
 								Send
-							</Button>
+							</StyledButton>
 						</Wrapper>
 					</List>
 				</div>

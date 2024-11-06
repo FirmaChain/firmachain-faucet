@@ -1,22 +1,8 @@
 import ReCAPTCHA from 'react-google-recaptcha';
-import {
-	Paper,
-	InputBase,
-	Divider,
-	IconButton,
-	Button,
-	Select,
-	MenuItem,
-	Typography,
-	Snackbar,
-	Card,
-	CardContent,
-	SnackbarCloseReason,
-} from '@material-ui/core';
-import SendIcon from '@material-ui/icons/Send';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import { Divider, MenuItem, Snackbar, CardContent, SnackbarCloseReason, Alert, AlertColor } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import { ChangeEvent, SyntheticEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { makeStyles } from '@material-ui/core/styles';
 import {
 	Container,
 	ContentsContainer,
@@ -43,12 +29,23 @@ import NftDrawer from '../components/nft_drawer';
 
 import { LoadingProgress } from '../components/loading/loading_progress';
 
-import { Alert, Color } from '@material-ui/lab';
 import { useSelector } from 'react-redux';
 
 import { WalletUtil } from '../utils/wallet_util';
 import { TabTableProvider } from '../context/tabTableContext';
 import { useUtilContext } from '../context/utilContext';
+import {
+	MainButton,
+	MainCard,
+	MainCardTypo,
+	MainFooterTypo,
+	MainIconButton,
+	MainInput,
+	MainNetworkSelect,
+	MainPaper,
+	VerticalDivider,
+} from '../components/muiComponents';
+import JsonViewer from '../components/jsonViewer/jsonViewer';
 
 interface ResultLog {
 	code: string;
@@ -65,105 +62,11 @@ const Video_Background = styled.video`
 	object-fit: cover;
 `;
 
-const useStyles = makeStyles((theme) => ({
-	// input style
-	paper: {
-		padding: '2px 4px',
-		display: 'flex',
-		alignItems: 'center',
-		width: '40%',
-		height: '50px',
-		minWidth: '350px',
-		maxWidth: '500px',
-	},
-	list: {
-		width: '100%',
-		maxWidth: '500px',
-	},
-	input: {
-		marginLeft: theme.spacing(1),
-		flex: 1,
-	},
-	iconButton: {
-		padding: 10,
-	},
-	divider: {
-		backgroundColor: '#fff',
-	},
-	vertical_divider: {
-		height: 28,
-		margin: 4,
-	},
-
-	// drawer style
-	disabled_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	active_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		marginBottom: '10px',
-	},
-	select: {
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		width: '50px',
-	},
-	text: {
-		padding: '10px',
-		color: '#fff',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	// button style
-	main_button: {
-		margin: '10px',
-		width: '100%',
-		maxWidth: '250px',
-	},
-	drawer_button: {
-		width: '100px',
-		marginTop: '10px',
-	},
-
-	// card style
-	card: {
-		margin: '15px 0',
-		width: '100%',
-	},
-	card_text: {
-		padding: '10px',
-		color: '#818181',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	network_select: {
-		width: '120px',
-		marginRight: '20px',
-		textAlign: 'center',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	footer_text: {
-		padding: '10px 20px',
-		color: '#818181',
-		['@media (max-width: 770px)']: {
-			fontSize: '13px',
-			padding: '5px 20px',
-		},
-	},
-}));
-
 export default function Main() {
 	const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITEKEY || '';
 	const explorerUrl = process.env.REACT_APP_EXPLORER_URL || '';
+
+	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
 
 	const walletState = useSelector((state: any) => state.walletInfo);
 	const NftState = useSelector((state: any) => state.option);
@@ -188,24 +91,16 @@ export default function Main() {
 	const [sendingState, setSendingState] = useState(false);
 	const [resultLog, setResultLog] = useState<null | ResultLog>(null);
 
-	const classes = useStyles();
 	const [sendAddressInput, setSendAddressInput] = useState('');
 
-	const [network, setNetwork] = useState('imperium');
-	const networkData = ['imperium'];
+	const NETWORK_NAME = SDK().Config.chainID.split('-')[0] || '-';
 
-	// const [alertOpen, setAlertOpen] = useState(false);
-	// const [alertTimer, setAlertTimer] = useState(1000);
-	// const [alertType, setAlertType] = useState('success');
-	// const [alertMessage, setAlertMessage] = useState('');
-
-	// const [isLoading, setIsLoading] = useState(false);
+	const [network, setNetwork] = useState(NETWORK_NAME);
+	const networkData = [NETWORK_NAME];
 
 	const [openWalletDrawer, setOpenWalletDrawer] = useState(false);
 	const [openRecoverDrawer, setOpenRecoverDrawer] = useState(false);
 	const [openNftDrawer, setOpenNftDrawer] = useState<boolean>(false);
-
-	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
 
 	const moveToExplorer = () => {
 		window.open(explorerUrl, '_blank');
@@ -219,7 +114,7 @@ export default function Main() {
 		if (typeof value === 'string') sendAddress();
 	};
 
-	const handleAlertClose = (event?: React.SyntheticEvent<any>, reason?: SnackbarCloseReason) => {
+	const handleAlertClose = (event?: Event | SyntheticEvent<any, Event>, reason?: SnackbarCloseReason) => {
 		if (reason === 'clickaway') {
 			return;
 		}
@@ -336,12 +231,7 @@ export default function Main() {
 				<ContentsContainer>
 					<HeaderBox>
 						<MainTitle banner src="/assets/firma_chain_title.svg" onClick={() => moveToExplorer()} />
-						<Select
-							className={classes.network_select}
-							value={network}
-							onChange={(e) => handleNetwork(e)}
-							MenuProps={{ disablePortal: true }}
-						>
+						<MainNetworkSelect value={network} onChange={(e) => handleNetwork(e)} MenuProps={{ disablePortal: true }}>
 							{networkData.map((network) => {
 								return (
 									<MenuItem value={network} key={'select-option-' + network}>
@@ -349,43 +239,36 @@ export default function Main() {
 									</MenuItem>
 								);
 							})}
-						</Select>
+						</MainNetworkSelect>
 					</HeaderBox>
 
 					<MainBox>
 						<MainTitle src="/assets/firma_chain_title.svg" />
 						<Wrapper style={{ padding: '10px 0 50px 0' }}>
-							<Paper className={classes.paper}>
-								<InputBase
+							<MainPaper>
+								<MainInput
 									disabled={sendingState}
-									className={classes.input}
 									placeholder="Address"
 									value={sendAddressInput}
 									onChange={handleSendAddressInputText}
 									onKeyPress={handleOnKeyPress}
 								/>
-								<Divider className={classes.vertical_divider} orientation="vertical" />
-								<IconButton
-									disabled={sendingState}
-									color="primary"
-									className={classes.iconButton}
-									onClick={() => activateSendProcess()}
-								>
+								<VerticalDivider orientation="vertical" />
+								<MainIconButton disabled={sendingState} color="primary" onClick={() => activateSendProcess()}>
 									<SendIcon />
-								</IconButton>
-							</Paper>
+								</MainIconButton>
+							</MainPaper>
 						</Wrapper>
 						<MainButtonBox>
 							<MainButtonWrapper>
-								<Button className={classes.main_button} variant="contained" onClick={() => setOpenWalletDrawer(true)}>
+								<MainButton variant="contained" onClick={() => setOpenWalletDrawer(true)}>
 									wallet
-								</Button>
-								<Button className={classes.main_button} variant="contained" onClick={() => setOpenRecoverDrawer(true)}>
+								</MainButton>
+								<MainButton variant="contained" onClick={() => setOpenRecoverDrawer(true)}>
 									Recover
-								</Button>
-								<Button
+								</MainButton>
+								<MainButton
 									disabled={walletState.walletAddress === ''}
-									className={classes.main_button}
 									variant="contained"
 									style={{
 										backgroundColor: walletState.walletAddress === '' ? '#a0a0a0' : '#e0e0e0',
@@ -393,7 +276,7 @@ export default function Main() {
 									onClick={() => setOpenNftDrawer(true)}
 								>
 									NFT
-								</Button>
+								</MainButton>
 							</MainButtonWrapper>
 						</MainButtonBox>
 					</MainBox>
@@ -411,68 +294,52 @@ export default function Main() {
 
 					{resultLog && (
 						<LogBox>
-							<Card className={classes.card}>
+							<MainCard>
 								<CardContent>
 									<LogSendTag>{resultLog.code}</LogSendTag>
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											hash
-										</Typography>
+										<MainCardTypo variant="body2" /*component="p"*/>hash</MainCardTypo>
 									</LogCardWrapper>
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
+										<MainCardTypo variant="body2" /*component="p"*/>
 											<a
 												style={{ color: '#1D86FF', cursor: 'pointer' }}
 												onClick={() => moveToExplorerTransaction(resultLog.transactionHash)}
 											>
 												{resultLog.transactionHash}
 											</a>
-										</Typography>
+										</MainCardTypo>
 									</LogCardWrapper>
 									<Divider />
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											gasUsed
-										</Typography>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											{resultLog.gasUsed}
-										</Typography>
+										<MainCardTypo variant="body2" /*component="p"*/>gasUsed</MainCardTypo>
+										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasUsed}</MainCardTypo>
 									</LogCardWrapper>
 									<Divider />
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											gasWanted
-										</Typography>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											{resultLog.gasWanted}
-										</Typography>
+										<MainCardTypo variant="body2" /*component="p"*/>gasWanted</MainCardTypo>
+										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasWanted}</MainCardTypo>
 									</LogCardWrapper>
 									<Divider />
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											rawLog
-										</Typography>
+										<MainCardTypo variant="body2" /*component="p"*/>rawLog</MainCardTypo>
 									</LogCardWrapper>
 									<LogCardWrapper>
-										<Typography className={classes.card_text} variant="body2" component="p">
-											{resultLog.rawLog}
-										</Typography>
+										<JsonViewer data={JSON.parse(resultLog.rawLog)} />
 									</LogCardWrapper>
 								</CardContent>
-							</Card>
+							</MainCard>
 						</LogBox>
 					)}
 
 					<FooterBox>
-						<Typography className={classes.footer_text} variant="body1">
-							Copyright © FIRMACHAIN 2023
-						</Typography>
-						<Typography className={classes.footer_text} variant="body1">
+						<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2023</MainFooterTypo>
+						<MainFooterTypo variant="body1">
 							Maintained By{' '}
 							<a style={{ color: '#1D86FF' }} href="https://firmachain.org/">
 								FIRMACHAIN
 							</a>
-						</Typography>
+						</MainFooterTypo>
 					</FooterBox>
 				</ContentsContainer>
 			</Container>
@@ -496,7 +363,7 @@ export default function Main() {
 				autoHideDuration={alertTimer}
 				onClose={handleAlertClose}
 			>
-				<Alert severity={alertType as Color}>{alertMessage}</Alert>
+				<Alert severity={alertType as AlertColor}>{alertMessage}</Alert>
 			</Snackbar>
 
 			{/* Loading */}

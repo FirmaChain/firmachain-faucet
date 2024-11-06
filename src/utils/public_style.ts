@@ -113,6 +113,7 @@ export const FooterBox = styled.div`
 	display: flex;
 	position: fixed;
 	bottom: 0;
+	left: 0;
 	background-color: #131316;
 
 	@media (max-width: 770px) {

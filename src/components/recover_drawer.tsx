@@ -1,10 +1,5 @@
-import { Button, ClickAwayListener } from '@material-ui/core';
-import { TextField, Typography } from '@material-ui/core';
-import { List, ListItem } from '@material-ui/core';
-import { Divider } from '@material-ui/core';
-import { Drawer } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import CloseIcon from '@material-ui/icons/Close';
+import { ClickAwayListener, List, ListItem, Drawer } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { Wrapper } from '../utils/public_style';
 
@@ -15,39 +10,7 @@ import { WalletInfoActions } from '../redux/actions';
 
 import { WalletUtil } from '../utils/wallet_util';
 import { useUtilContext } from '../context/utilContext';
-
-const useStyles = makeStyles((theme) => ({
-	divider: {
-		backgroundColor: '#fff',
-	},
-
-	// text field
-	disabled_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	active_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		marginBottom: '10px',
-	},
-
-	typography_text: {
-		padding: '10px',
-		color: '#fff',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	button: {
-		backgroundColor: '#fff',
-		width: '90%',
-		padding: '10px',
-	},
-}));
+import { DisabledTextField, DrawerButton, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
 
 export default function RecoverDrawer({
 	open,
@@ -62,7 +25,6 @@ export default function RecoverDrawer({
 
 	const { handleAlertOpen } = useUtilContext();
 
-	const classes = useStyles();
 	const DrawerTitle = 'Recover';
 
 	const [mnemonic, setMnemonic] = useState('');
@@ -146,42 +108,24 @@ export default function RecoverDrawer({
 							alignItems: 'center',
 						}}
 					>
-						<Typography className={classes.typography_text} variant="h5">
-							{DrawerTitle}
-						</Typography>
+						<StyledTypo variant="h5">{DrawerTitle}</StyledTypo>
 						<CloseIcon style={{ color: '#fff', cursor: 'pointer' }} onClick={() => closeDrawer()} />
 					</Wrapper>
-					<Divider className={classes.divider} />
+					<StyledDivider />
 					<List>
-						<Typography className={classes.typography_text} variant="body2">
-							Mnemonic
-						</Typography>
+						<StyledTypo variant="body2">Mnemonic</StyledTypo>
 						<ListItem>
-							<TextField
-								className={classes.disabled_textfield}
-								multiline
-								maxRows={5}
-								variant="outlined"
-								onChange={onChangeMnemonicInput}
-								value={mnemonic}
-							/>
+							<DisabledTextField multiline maxRows={5} variant="outlined" onChange={onChangeMnemonicInput} value={mnemonic} />
 						</ListItem>
 
-						<Typography className={classes.typography_text} variant="body2">
-							Private Key
-						</Typography>
+						<StyledTypo variant="body2">Private Key</StyledTypo>
 						<ListItem>
-							<TextField
-								className={classes.disabled_textfield}
-								variant="outlined"
-								onChange={onChangePrivateKeyInput}
-								value={privateKey}
-							/>
+							<DisabledTextField variant="outlined" onChange={onChangePrivateKeyInput} value={privateKey} />
 						</ListItem>
 						<Wrapper>
-							<Button className={classes.button} variant="contained" onClick={() => setRecovery(true)}>
+							<StyledButton variant="contained" onClick={() => setRecovery(true)}>
 								Recover
-							</Button>
+							</StyledButton>
 						</Wrapper>
 					</List>
 				</div>

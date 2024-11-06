@@ -1,81 +1,11 @@
-import { Button, IconButton, Paper } from '@material-ui/core';
-import { TextField, InputBase, Typography } from '@material-ui/core';
-import { ListItem } from '@material-ui/core';
-import { Divider } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import FileIcon from '@material-ui/icons/AttachFile';
-
+import { IconButton, ListItem } from '@mui/material';
+import FileIcon from '@mui/icons-material/AttachFile';
 import { Wrapper } from '../../utils/public_style';
-
 import { ChangeEvent, useState } from 'react';
-
 import { NftUtil } from '../../utils/nft_util';
 import { useTabTableContext } from '../../context/tabTableContext';
 import { useUtilContext } from '../../context/utilContext';
-
-const useStyles = makeStyles((theme) => ({
-	paper: {
-		display: 'flex',
-		alignItems: 'center',
-		width: '100%',
-		height: '50px',
-	},
-
-	divider: {
-		backgroundColor: '#fff',
-	},
-	vertical_divider: {
-		height: 28,
-		margin: 4,
-	},
-
-	// text field
-	disabled_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-	},
-	active_textfield: {
-		width: '100%',
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		marginBottom: '10px',
-	},
-	attach_textfield: {
-		fontSize: '12px',
-		width: '100%',
-		padding: '0 10px',
-	},
-
-	typography_text: {
-		padding: '10px',
-		color: '#fff',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	typography_sub_text: {
-		padding: '0 10px 0 18px',
-		color: '#888',
-		['@media (max-width: 770px)']: {
-			wordBreak: 'all',
-		},
-	},
-
-	button: {
-		backgroundColor: '#fff',
-		width: '90%',
-		padding: '10px',
-		margin: '0 5px',
-	},
-
-	account_select: {
-		backgroundColor: '#fff',
-		borderRadius: '3px',
-		width: '50px',
-	},
-}));
+import { AttachTextField, DisabledTextField, SectionPaper, StyledButton, StyledTypo, SubTypo, VerticalDivider } from '../muiComponents';
 
 export default function CreateNFTSection({ open }: { open: boolean }) {
 	const { newNft } = NftUtil();
@@ -83,8 +13,6 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 	const { handleNFTButtons } = useTabTableContext();
 
 	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
-
-	const classes = useStyles();
 
 	const [nftFile, setNftFile] = useState<ArrayBuffer | null>(null);
 	const [nftFileName, setNftFileName] = useState<string>('');
@@ -175,58 +103,34 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 
 	return (
 		<>
-			<Typography className={classes.typography_text} variant="body2">
-				Attach Image File
-			</Typography>
+			<StyledTypo variant="body2">Attach Image File</StyledTypo>
 			<ListItem>
-				<Paper className={classes.paper}>
-					<InputBase className={classes.attach_textfield} disabled value={nftFileName + (nftFileName && ` (${nftFileSize} MB)`)} />
-					<Divider className={classes.vertical_divider} orientation="vertical" />
+				<SectionPaper>
+					<AttachTextField disabled value={nftFileName + (nftFileName && ` (${nftFileSize} MB)`)} />
+					<VerticalDivider orientation="vertical" />
 					<IconButton color="primary" component="label">
 						<FileIcon />
 						<input id={'ntf_file_input'} style={{ display: 'none' }} type="file" name="imageFile" onChange={fileChangedHandler} />
 					</IconButton>
-				</Paper>
+				</SectionPaper>
 			</ListItem>
-			<Typography className={classes.typography_sub_text} variant="body2">
-				(Maximum file size : 20MB)
-			</Typography>
-			<Typography className={classes.typography_text} variant="body2">
-				Name
-			</Typography>
+			<SubTypo variant="body2">(Maximum file size : 20MB)</SubTypo>
+			<StyledTypo variant="body2">Name</StyledTypo>
 			<ListItem>
-				<TextField className={classes.disabled_textfield} variant="outlined" onChange={onChangeNftName} value={nftName} />
+				<DisabledTextField variant="outlined" onChange={onChangeNftName} value={nftName} />
 			</ListItem>
-			<Typography className={classes.typography_text} variant="body2">
-				Description
-			</Typography>
+			<StyledTypo variant="body2">Description</StyledTypo>
 			<ListItem>
-				<TextField
-					className={classes.disabled_textfield}
-					multiline
-					maxRows={5}
-					variant="outlined"
-					onChange={onChangeNftDesc}
-					value={nftDesc}
-				/>
+				<DisabledTextField multiline maxRows={5} variant="outlined" onChange={onChangeNftDesc} value={nftDesc} />
 			</ListItem>
-			<Typography className={classes.typography_text} variant="body2">
-				Memo
-			</Typography>
+			<StyledTypo variant="body2">Memo</StyledTypo>
 			<ListItem>
-				<TextField
-					className={classes.disabled_textfield}
-					multiline
-					maxRows={5}
-					variant="outlined"
-					onChange={onChangeNftMemo}
-					value={nftMemo}
-				/>
+				<DisabledTextField multiline maxRows={5} variant="outlined" onChange={onChangeNftMemo} value={nftMemo} />
 			</ListItem>
 			<Wrapper>
-				<Button className={classes.button} variant="contained" onClick={() => mintNFT()} disabled={isMintNFT}>
+				<StyledButton variant="contained" onClick={() => mintNFT()} disabled={isMintNFT}>
 					Create
-				</Button>
+				</StyledButton>
 			</Wrapper>
 		</>
 	);

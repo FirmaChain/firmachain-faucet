@@ -6,14 +6,10 @@ import { WalletInfoActions } from '../redux/actions';
 const faucetMnemonic = process.env.REACT_APP_FAUCET_MNEMONIC || '';
 
 export function WalletUtil() {
-	const network = useSelector((state: any) => state.option.network);
+	// const network = useSelector((state: any) => state.option.network);
 	const state = useSelector((state: any) => state.walletInfo);
 	const SDK = () => {
-		//? Always return testnet sdk
-		// switch (network) {
-		//   case 'imperium':
 		return new FirmaSDK(FirmaConfig.TestNetConfig);
-		// }
 	};
 
 	const newWallet = async () => {

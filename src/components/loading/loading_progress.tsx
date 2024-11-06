@@ -1,4 +1,4 @@
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress } from '@mui/material';
 
 export function LoadingProgress({ open }: { open?: boolean }) {
 	return (
@@ -16,7 +16,6 @@ export function LoadingProgress({ open }: { open?: boolean }) {
 						display: 'flex',
 						zIndex: '99999',
 					}}
-					//   onClick={null}
 				>
 					<CircularProgress />
 				</div>
