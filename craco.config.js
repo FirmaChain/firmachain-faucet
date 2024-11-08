@@ -4,8 +4,10 @@ const path = require('path');
 const configureWebpack = (webpackConfig, { env, paths }) => {
 	const fallback = webpackConfig.resolve.fallback || {};
 	webpackConfig.resolve.fallback = Object.assign(fallback, {
+		crypto: require.resolve('crypto-browserify'),
 		stream: require.resolve('stream-browserify'),
 		fs: require.resolve('browserify-fs'),
+		vm: require.resolve('vm-browserify'),
 	});
 
 	const alias = webpackConfig.resolve.alias || {};
