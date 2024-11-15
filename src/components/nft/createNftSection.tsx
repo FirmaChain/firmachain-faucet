@@ -6,9 +6,14 @@ import { NftUtil } from '@/utils/nft_util';
 import { useTabTableContext } from '@/context/tabTableContext';
 import { useUtilContext } from '@/context/utilContext';
 import { AttachTextField, DisabledTextField, SectionPaper, StyledButton, StyledTypo, SubTypo, VerticalDivider } from '../muiComponents';
+import useWallet from '@/store/useWallet';
+import { WalletUtil } from '@/utils/wallet_util';
+import { FirmaUtil } from '@firmachain/firma-js';
 
 export default function CreateNFTSection({ open }: { open: boolean }) {
 	const { newNft } = NftUtil();
+	const { SDK } = WalletUtil();
+	const { fctBalance } = useWallet();
 
 	const { handleNFTButtons } = useTabTableContext();
 
@@ -38,27 +43,28 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 
 	const fileChangedHandler = (event: ChangeEvent<HTMLInputElement>) => {
 		event.preventDefault();
+
 		const reader = new FileReader();
 
-		if (event.target.files === null) {
-			handleAlertOpen('Failed to read file', 3000, 'error');
-			return;
-		}
+		const file = event.target.files ? event.target.files[0] : undefined;
 
-		const file = event.target.files[0];
+		if (file === undefined) return;
 
 		reader.readAsArrayBuffer(file);
 
 		reader.onload = function () {
-			if (file.size / 1024 / 1024 > 20) {
-				// file limit
-				handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
-				return;
-			}
+			if (file) {
+				if (file.size / 1024 / 1024 > 20) {
+					// file limit
+					handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
+					return;
+				}
 
-			setNftFileSize((file.size / 1024 / 1024).toFixed(2));
-			setNftFileName(file.name);
-			setNftFile(reader.result as ArrayBuffer);
+				setNftFileSize((file.size / 1024 / 1024).toFixed(2));
+				setNftFileName(file.name);
+
+				setNftFile(reader.result as ArrayBuffer);
+			}
 		};
 
 		reader.onerror = function () {
@@ -68,6 +74,14 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 
 	const mintNFT = async () => {
 		if (nftFile === null || nftName === '' || nftDesc === '') return;
+
+		const defaultFee = FirmaUtil.getFCTStringFromUFCT(SDK().Config.defaultFee);
+
+		if (Number(fctBalance) < Number(defaultFee)) {
+			handleAlertOpen('Insufficient funds. Please check your account balance.', 5000, 'error');
+			return;
+		}
+
 		handleLoadingOpen(true);
 		setIsMintNFT(true);
 		try {
@@ -99,7 +113,14 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 					<VerticalDivider orientation="vertical" />
 					<IconButton color="primary" component="label">
 						<FileIcon />
-						<input id={'ntf_file_input'} style={{ display: 'none' }} type="file" name="imageFile" onChange={fileChangedHandler} />
+						<input
+							id={'ntf_file_input'}
+							style={{ display: 'none' }}
+							type="file"
+							name="imageFile"
+							accept="image/*"
+							onChange={fileChangedHandler}
+						/>
 					</IconButton>
 				</SectionPaper>
 			</ListItem>

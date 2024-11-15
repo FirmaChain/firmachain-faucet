@@ -1,20 +1,42 @@
+import axios from 'axios';
 import { WalletUtil } from './wallet_util';
 import useWallet from '@/store/useWallet';
+import { FirmaUtil } from '@firmachain/firma-js';
 
 export function NftUtil() {
 	const walletInfo = useWallet();
 
 	const { SDK, getCurrentWallet } = WalletUtil();
 
-	const newNft = async (file: any, name: string, desc: string, memo: string) => {
-		let fileHash = await SDK().Ipfs.addBuffer(file);
-		let fileUrl = await SDK().Ipfs.getURLFromHash(fileHash);
+	const customAddBuffer = async (buffer: ArrayBuffer): Promise<string> => {
+		try {
+			var bodyData = new FormData();
+			bodyData.append('buffer', new Blob([buffer]));
+
+			const response = await axios.request({
+				url: SDK().Config.ipfsNodeAddress + ':' + SDK().Config.ipfsNodePort + '/api/v0/add',
+				method: 'POST',
+				headers: { 'Content-Type': 'multipart/form-data' },
+				data: bodyData,
+			});
+
+			return response.data.Hash;
+		} catch (error) {
+			FirmaUtil.printLog(error);
+			throw error;
+		}
+	};
+
+	const newNft = async (file: ArrayBuffer, name: string, desc: string, memo: string) => {
+		const fileHash = await customAddBuffer(file);
+
+		const fileUrl = await SDK().Ipfs.getURLFromHash(fileHash);
 
 		let json = '{"name" : "' + name + '", "description" : "' + desc + '", "path" : "' + fileUrl + '"}'; // eslint:ignre-no-useless-escape
-		let nftJson = await SDK().Ipfs.addJson(json);
-		let jsonUrl = await SDK().Ipfs.getURLFromHash(nftJson);
+		const nftJson = await SDK().Ipfs.addJson(json);
+		const jsonUrl = await SDK().Ipfs.getURLFromHash(nftJson);
 
-		let result = await mintNft(jsonUrl, memo);
+		const result = await mintNft(jsonUrl, memo);
 
 		return result;
 	};

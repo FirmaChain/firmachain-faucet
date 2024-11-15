@@ -8,6 +8,7 @@ const configureWebpack = (webpackConfig, { env, paths }) => {
 		stream: require.resolve('stream-browserify'),
 		fs: require.resolve('browserify-fs'),
 		vm: require.resolve('vm-browserify'),
+		'process/browser': require.resolve('process/browser'),
 	});
 
 	const alias = webpackConfig.resolve.alias || {};

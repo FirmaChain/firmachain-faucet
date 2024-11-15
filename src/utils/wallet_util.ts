@@ -65,7 +65,6 @@ export function WalletUtil() {
 	const getCurrentWallet = async (index: number) => {
 		if (walletInfo.mnemonic !== '') {
 			const wallet = await SDK().Wallet.fromMnemonic(walletInfo.mnemonic, index);
-			console.log(await wallet.getAddress());
 
 			return wallet;
 		} else {

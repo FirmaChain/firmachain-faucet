@@ -51,8 +51,6 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 	// Account Key index
 	const onChangeAccountIndex = (event: SelectChangeEvent<unknown>) => {
 		//? value type is 'number'
-		console.log(event.target.value);
-
 		useWallet.getState().setAccountIndex(event.target.value as number);
 	};
 
