@@ -1,7 +1,7 @@
 import { FirmaConfig, FirmaSDK, FirmaWalletService } from '@firmachain/firma-js';
 import useWallet from '@/store/useWallet';
 
-const faucetMnemonic = process.env.REACT_APP_FAUCET_MNEMONIC || '';
+const faucetMnemonic = import.meta.env.VITE_FAUCET_MNEMONIC || '';
 
 export function WalletUtil() {
 	const walletInfo = useWallet();

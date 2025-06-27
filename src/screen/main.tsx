@@ -47,7 +47,7 @@ interface ResultLog {
 	gasWanted: number;
 	height: number;
 	transactionHash: string;
-	rawLog: string;
+	rawLog: Record<string, string>;
 }
 
 const Video_Background = styled.video`
@@ -57,8 +57,8 @@ const Video_Background = styled.video`
 `;
 
 export default function Main() {
-	const reCaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITEKEY || '';
-	const explorerUrl = process.env.REACT_APP_EXPLORER_URL || '';
+	const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITEKEY || '';
+	const explorerUrl = import.meta.env.VITE_EXPLORER_URL || '';
 
 	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
 
@@ -155,16 +155,33 @@ export default function Main() {
 
 		try {
 			let result: any = await sendTokenFromFaucet(sendAddressInput);
+
+			// Result code is not 0, it means request is failed with some reason.
 			const resultCode = result.code === 0 ? 'Success' : result.code;
-			setResultLog({
+			const tmpResult = {
 				code: resultCode,
 				gasUsed: result.gasUsed,
 				gasWanted: result.gasWanted,
 				height: result.height,
 				transactionHash: result.transactionHash,
 				rawLog: result.rawLog,
-			});
-			handleAlertClose();
+			};
+
+			try {
+				const parsed = JSON.parse(result.rawLog);
+				tmpResult.rawLog = parsed;
+			} catch (error) {
+				console.log('Result rawLog is not json.');
+				tmpResult.rawLog = { result: tmpResult.rawLog };
+			}
+
+			if (result.code !== 0) {
+				handleAlertOpen(result.rawLog, 5000, 'error');
+			} else {
+				handleAlertClose();
+			}
+
+			setResultLog(tmpResult);
 
 			if (walletInfo.walletExist) {
 				let balance = await getWalletBalance();
@@ -309,7 +326,7 @@ export default function Main() {
 										<MainCardTypo variant="body2" /*component="p"*/>rawLog</MainCardTypo>
 									</LogCardWrapper>
 									<LogCardWrapper>
-										<JsonViewer data={JSON.parse(resultLog.rawLog)} />
+										<JsonViewer data={resultLog.rawLog} />
 									</LogCardWrapper>
 								</CardContent>
 							</MainCard>
