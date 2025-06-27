@@ -40,6 +40,7 @@ import {
 } from '@/components/muiComponents';
 import JsonViewer from '@/components/jsonViewer/jsonViewer';
 import useWallet from '@/store/useWallet';
+import { revealKey } from '@/utils/common';
 
 interface ResultLog {
 	code: string;
@@ -57,7 +58,7 @@ const Video_Background = styled.video`
 `;
 
 export default function Main() {
-	const reCaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITEKEY || '';
+	const reCaptchaSiteKey = revealKey(import.meta.env.VITE_RECAPTCHA_SITEKEY) || '';
 	const explorerUrl = import.meta.env.VITE_EXPLORER_URL || '';
 
 	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
