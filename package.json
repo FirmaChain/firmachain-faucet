@@ -36,7 +36,7 @@
 	"scripts": {
 		"dev": "vite dev --mode dev",
 		"testnet": "vite dev --mode testnet",
-		"build": "GENERATE_SOURCEMAP=false vite build --mode testnet",
+		"build": "vite build --mode testnet",
 		"deploy": "aws s3 sync ./build s3://deploy-ecosystem/testnet/faucet --profile=firmachain-deploy --delete",
 		"invalidate": "aws cloudfront create-invalidation --profile=firmachain-deploy --distribution-id E3KRC3IQXC40MN --paths '/*'",
 		"format": "prettier --write \"src/**/*.{ts,tsx}\""

@@ -9,3 +9,15 @@ export function revealKey(obfuscated: string): string {
 		return '';
 	}
 }
+
+export function obfuscateKey(original: string): string {
+	try {
+		const base64 = btoa(original);
+		return Array.from(base64)
+			.map((char) => String.fromCharCode(char.charCodeAt(0) << 1))
+			.join('');
+	} catch (error) {
+		console.error('Failed to obfuscate key:', error);
+		return '';
+	}
+}
