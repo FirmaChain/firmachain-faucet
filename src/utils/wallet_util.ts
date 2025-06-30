@@ -96,7 +96,7 @@ export function WalletUtil() {
 	};
 
 	const sendTokenFromFaucet = async (address: string) => {
-		const FCTAmount = 1000;
+		const FCTAmount = 1;
 		const memo = 'faucet';
 
 		const faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
