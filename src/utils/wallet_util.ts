@@ -80,6 +80,11 @@ export function WalletUtil() {
 		return getFCTStringFromUFCT(balance);
 	};
 
+	const getBalance = async (address: string) => {
+		const balance = await SDK().Bank.getBalance(address);
+		return getFCTStringFromUFCT(balance);
+	};
+
 	function getFCTStringFromUFCT(uFctAmount: string) {
 		const number = Number(uFctAmount);
 
@@ -114,6 +119,7 @@ export function WalletUtil() {
 		recoverWallet,
 		getCurrentWallet,
 		getWalletBalance,
+		getBalance,
 		sendToken,
 		sendTokenFromFaucet,
 	};

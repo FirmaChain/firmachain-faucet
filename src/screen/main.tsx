@@ -54,7 +54,7 @@ export default function Main() {
 	const reCaptchaSiteKey = revealKey(import.meta.env.VITE_RECAPTCHA_SITEKEY) || '';
 	const explorerUrl = import.meta.env.VITE_EXPLORER_URL || '';
 
-	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
+	const { SDK, getWalletBalance, sendTokenFromFaucet, getBalance } = WalletUtil();
 
 	const walletInfo = useWallet();
 
@@ -149,31 +149,35 @@ export default function Main() {
 
 		if (!FirmaUtil.isValidAddress(sendAddressInput)) {
 			handleAlertOpen('Please input valid address!', 5000, 'error');
-			resetSendStatus();
 		} else {
 			try {
-				let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
-
-				if (result.code !== 0) {
-					handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
+				// Get token balance of current address
+				const curBalance = await getBalance(sendAddressInput);
+				if (Number(curBalance) >= 10) {
+					handleAlertOpen('You already hold more than the allowed amount.', 5000, 'error');
 				} else {
-					handleAlertClose();
+					let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
+
+					if (result.code !== 0) {
+						handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
+					} else {
+						handleAlertClose();
+					}
+
+					setResultLog(result);
+
+					if (walletInfo.walletExist) {
+						let balance = await getWalletBalance();
+						useWallet.getState().setFCTBalance(balance);
+					}
 				}
-
-				setResultLog(result);
-
-				if (walletInfo.walletExist) {
-					let balance = await getWalletBalance();
-					useWallet.getState().setFCTBalance(balance);
-				}
-
-				resetSendStatus();
 			} catch (error: any) {
 				console.log('[error] ' + error);
 				handleAlertOpen(error.message, 5000, 'error');
-				resetSendStatus();
 			}
 		}
+
+		resetSendStatus();
 	};
 
 	const handleWalletDrawer = (open: boolean) => {
