@@ -42,15 +42,7 @@ import JsonViewer from '@/components/jsonViewer/jsonViewer';
 import useWallet from '@/store/useWallet';
 import { convertBigIntToString, revealKey } from '@/utils/common';
 import { DeliverTxResponse } from '@firmachain/firma-js/dist/sdk/firmachain/common/stargateclient';
-
-interface ResultLog {
-	code: string;
-	gasUsed: number;
-	gasWanted: number;
-	height: number;
-	transactionHash: string;
-	rawLog: Record<string, string>;
-}
+import { FirmaUtil } from '@firmachain/firma-js';
 
 const Video_Background = styled.video`
 	width: 100%;
@@ -135,11 +127,12 @@ export default function Main() {
 			return;
 		}
 
-		//? Disable this line to hide ReCaptcha
-		// setOpenRecaptcha(true);
-
-		//? Enable this line to hide ReCaptcha
-		sendAddress();
+		// If this services static, sending will require Captcha.
+		if (import.meta.env.MODE === 'production') {
+			setOpenRecaptcha(true);
+		} else {
+			sendAddress();
+		}
 	};
 
 	const resetSendStatus = () => {
@@ -153,50 +146,33 @@ export default function Main() {
 	const sendAddress = async () => {
 		if (sendingState) return;
 		handleLoadingOpen(true);
-		setSendingState(true);
 
-		try {
-			let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
-
-			console.log('result', result);
-
-			// Result code is not 0, it means request is failed with some reason.
-			// const resultCode = result.code === 0 ? 'Success' : result.code;
-			// const tmpResult = {
-			// 	code: resultCode,
-			// 	gasUsed: result.gasUsed,
-			// 	gasWanted: result.gasWanted,
-			// 	height: result.height,
-			// 	transactionHash: result.transactionHash,
-			// 	// rawLog: result.rawLog,
-			// };
-
-			// try {
-			// 	const parsed = JSON.parse(result);
-			// 	tmpResult.rawLog = parsed;
-			// } catch (error) {
-			// 	console.log('Result rawLog is not json.');
-			// 	tmpResult = { result: tmpResult.rawLog };
-			// }
-
-			if (result.code !== 0) {
-				handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
-			} else {
-				handleAlertClose();
-			}
-
-			setResultLog(result);
-
-			if (walletInfo.walletExist) {
-				let balance = await getWalletBalance();
-				useWallet.getState().setFCTBalance(balance);
-			}
-
+		if (!FirmaUtil.isValidAddress(sendAddressInput)) {
+			handleAlertOpen('Please input valid address!', 5000, 'error');
 			resetSendStatus();
-		} catch (error: any) {
-			console.log('[error] ' + error);
-			handleAlertOpen(error.message, 5000, 'error');
-			resetSendStatus();
+		} else {
+			try {
+				let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
+
+				if (result.code !== 0) {
+					handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
+				} else {
+					handleAlertClose();
+				}
+
+				setResultLog(result);
+
+				if (walletInfo.walletExist) {
+					let balance = await getWalletBalance();
+					useWallet.getState().setFCTBalance(balance);
+				}
+
+				resetSendStatus();
+			} catch (error: any) {
+				console.log('[error] ' + error);
+				handleAlertOpen(error.message, 5000, 'error');
+				resetSendStatus();
+			}
 		}
 	};
 
