@@ -21,3 +21,14 @@ export function obfuscateKey(original: string): string {
 		return '';
 	}
 }
+
+export function convertBigIntToString(obj: any): any {
+	if (typeof obj === 'bigint') {
+		return obj.toString() + 'n';
+	} else if (Array.isArray(obj)) {
+		return obj.map(convertBigIntToString);
+	} else if (obj !== null && typeof obj === 'object') {
+		return Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, convertBigIntToString(v)]));
+	}
+	return obj;
+}

@@ -30,3 +30,6 @@ yarn.lock
 package-lock.json
 
 src/config.*
+
+.yarn
+!.yarn/releases

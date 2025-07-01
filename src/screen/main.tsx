@@ -40,7 +40,8 @@ import {
 } from '@/components/muiComponents';
 import JsonViewer from '@/components/jsonViewer/jsonViewer';
 import useWallet from '@/store/useWallet';
-import { revealKey } from '@/utils/common';
+import { convertBigIntToString, revealKey } from '@/utils/common';
+import { DeliverTxResponse } from '@firmachain/firma-js/dist/sdk/firmachain/common/stargateclient';
 
 interface ResultLog {
 	code: string;
@@ -70,7 +71,7 @@ export default function Main() {
 	const [openRecaptcha, setOpenRecaptcha] = useState(false);
 
 	const [sendingState, setSendingState] = useState(false);
-	const [resultLog, setResultLog] = useState<null | ResultLog>(null);
+	const [resultLog, setResultLog] = useState<null | DeliverTxResponse>(null);
 
 	const [sendAddressInput, setSendAddressInput] = useState('');
 
@@ -135,10 +136,10 @@ export default function Main() {
 		}
 
 		//? Disable this line to hide ReCaptcha
-		setOpenRecaptcha(true);
+		// setOpenRecaptcha(true);
 
 		//? Enable this line to hide ReCaptcha
-		// sendAddress();
+		sendAddress();
 	};
 
 	const resetSendStatus = () => {
@@ -155,34 +156,36 @@ export default function Main() {
 		setSendingState(true);
 
 		try {
-			let result: any = await sendTokenFromFaucet(sendAddressInput);
+			let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
+
+			console.log('result', result);
 
 			// Result code is not 0, it means request is failed with some reason.
-			const resultCode = result.code === 0 ? 'Success' : result.code;
-			const tmpResult = {
-				code: resultCode,
-				gasUsed: result.gasUsed,
-				gasWanted: result.gasWanted,
-				height: result.height,
-				transactionHash: result.transactionHash,
-				rawLog: result.rawLog,
-			};
+			// const resultCode = result.code === 0 ? 'Success' : result.code;
+			// const tmpResult = {
+			// 	code: resultCode,
+			// 	gasUsed: result.gasUsed,
+			// 	gasWanted: result.gasWanted,
+			// 	height: result.height,
+			// 	transactionHash: result.transactionHash,
+			// 	// rawLog: result.rawLog,
+			// };
 
-			try {
-				const parsed = JSON.parse(result.rawLog);
-				tmpResult.rawLog = parsed;
-			} catch (error) {
-				console.log('Result rawLog is not json.');
-				tmpResult.rawLog = { result: tmpResult.rawLog };
-			}
+			// try {
+			// 	const parsed = JSON.parse(result);
+			// 	tmpResult.rawLog = parsed;
+			// } catch (error) {
+			// 	console.log('Result rawLog is not json.');
+			// 	tmpResult = { result: tmpResult.rawLog };
+			// }
 
 			if (result.code !== 0) {
-				handleAlertOpen(result.rawLog, 5000, 'error');
+				handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
 			} else {
 				handleAlertClose();
 			}
 
-			setResultLog(tmpResult);
+			setResultLog(result);
 
 			if (walletInfo.walletExist) {
 				let balance = await getWalletBalance();
@@ -298,7 +301,7 @@ export default function Main() {
 						<LogBox>
 							<MainCard>
 								<CardContent>
-									<LogSendTag>{resultLog.code}</LogSendTag>
+									<LogSendTag>{resultLog.code === 0 ? 'Success' : 'Failure'}</LogSendTag>
 									<LogCardWrapper>
 										<MainCardTypo variant="body2" /*component="p"*/>hash</MainCardTypo>
 									</LogCardWrapper>
@@ -315,19 +318,19 @@ export default function Main() {
 									<Divider />
 									<LogCardWrapper>
 										<MainCardTypo variant="body2" /*component="p"*/>gasUsed</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasUsed}</MainCardTypo>
+										<MainCardTypo variant="body2" /*component="p"*/>{String(resultLog.gasUsed)}</MainCardTypo>
 									</LogCardWrapper>
 									<Divider />
 									<LogCardWrapper>
 										<MainCardTypo variant="body2" /*component="p"*/>gasWanted</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasWanted}</MainCardTypo>
+										<MainCardTypo variant="body2" /*component="p"*/>{String(resultLog.gasWanted)}</MainCardTypo>
 									</LogCardWrapper>
 									<Divider />
 									<LogCardWrapper>
 										<MainCardTypo variant="body2" /*component="p"*/>rawLog</MainCardTypo>
 									</LogCardWrapper>
 									<LogCardWrapper>
-										<JsonViewer data={resultLog.rawLog} />
+										<JsonViewer data={convertBigIntToString(resultLog)} />
 									</LogCardWrapper>
 								</CardContent>
 							</MainCard>
