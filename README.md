@@ -8,37 +8,83 @@ FirmaChain Faucet is a web service to obtain coins in testnet and devnet environ
 
 The coin provided should be used only for testing purposes. Also, we are not responsible for issues related to testnet/devnet coin.
 
-**WARNING**: The coin obtained through faucet is not compatible with the coin of mainnet and has no value.
+> ⚠️ <b>WARNING</b>: The coin obtained through faucet is not compatible with the coin of mainnet and has no value.
 
-## Environment
+## Stack
 
 - Node v20
 - React 18 + Typescript
 - Material Design
 - Zustand
 
----
+## Structure
 
-## Initial setup
+```
+.
+├── public/
+├── src/
+│   ├── components/
+│   ├── context/
+│   ├── screen/
+│   ├── store/
+│   └── ...
+├── .env.example
+├── package.json
+└── ...
+```
+
+## Getting Started
+
+### Installation
 
 ```bash
-nvm use
+git clone git@github.com:FirmaChain/firmachain-faucet.git
+cd firmachain-faucet
+
+nvm use # If using nvm.
+# If not, set the proper version within .nvmrc
 yarn install
 ```
 
----
+### Environment Variables
 
-## Development
+| Environment File | Description        |
+| ---------------- | ------------------ |
+| `.env.dev`       | Default / Dev mode |
+| `.env.testnet`   | Testnet            |
 
-### Local Development
+### Running the Development Server
 
-```bash
-yarn run dev 	    # Uses .env.dev
-yarn run testnet 	# Uses .env.testnet
-```
+| Script    | Environment File | Description         |
+| --------- | ---------------- | ------------------- |
+| `dev`     | `.env.dev`       | Default             |
+| `testnet` | `.env.testnet`   | Testnet environment |
 
-### Build
+### Available Scripts
 
-```bash
-yarn run build  # Uses .env.testnet
-```
+| Script                | Description                                |
+| --------------------- | ------------------------------------------ |
+| `yarn run dev`        | Run development server                     |
+| `yarn run testnet`    | Run development server with testnet config |
+| `yarn run build`      | Build static file with testnet config      |
+| `yarn run deploy`     | Deploy built static file to S3             |
+| `yarn run invalidate` | Invalidate current deployed static file    |
+| `yarn run format`     | Run prettier formatter                     |
+
+## Misc
+
+### How to generate proper FAUCET_MNEMONIC and RECAPTCHA_SITEKEY
+
+> ⚠️ <b style="color:red">"NEVER"</b> use mnemonic that contains any valuable asset.
+>
+> When you deploy this service on outer web, only use test keys that are safe to be exposed.
+>
+> Following obfuscated method is <b>NOT</b> a security method, but merely a basic obfuscation to prevent direct exposure of the key in the source.
+
+- You can obfuscate keys with the function named `obfuscateKey` stored in `/src/utils/common.ts`.
+
+### Why development servers don't check for recapture when requesting tokens
+
+- In development mode, checking recaptcha is disabled for testing convenience.
+- The 'dev state' is determined by if the page is on dev server, or static build.
+- You can find related code at `activateSendProcess` function in `/src/screen/main.tsx`
