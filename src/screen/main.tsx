@@ -154,7 +154,7 @@ export default function Main() {
 				// Get token balance of current address
 				const curBalance = await getBalance(sendAddressInput);
 				if (Number(curBalance) >= 10) {
-					handleAlertOpen('You already hold more than the allowed amount.', 5000, 'error');
+					handleAlertOpen('You cannot claim more tokens.', 5000, 'error');
 				} else {
 					let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
 
