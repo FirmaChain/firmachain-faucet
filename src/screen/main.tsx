@@ -295,30 +295,13 @@ export default function Main() {
 											</a>
 										</MainCardTypo>
 									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>gasUsed</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{String(resultLog.gasUsed)}</MainCardTypo>
-									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>gasWanted</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{String(resultLog.gasWanted)}</MainCardTypo>
-									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>rawLog</MainCardTypo>
-									</LogCardWrapper>
-									<LogCardWrapper>
-										<JsonViewer data={convertBigIntToString(resultLog)} />
-									</LogCardWrapper>
 								</CardContent>
 							</MainCard>
 						</LogBox>
 					)}
 				</ContentsContainer>
 				<FooterBox>
-					<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2023</MainFooterTypo>
+					<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2025</MainFooterTypo>
 					<MainFooterTypo variant="body1">
 						Maintained By{' '}
 						<a style={{ color: '#1D86FF' }} href="https://firmachain.org/">
