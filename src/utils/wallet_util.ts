@@ -80,6 +80,11 @@ export function WalletUtil() {
 		return getFCTStringFromUFCT(balance);
 	};
 
+	const getBalance = async (address: string) => {
+		const balance = await SDK().Bank.getBalance(address);
+		return getFCTStringFromUFCT(balance);
+	};
+
 	function getFCTStringFromUFCT(uFctAmount: string) {
 		const number = Number(uFctAmount);
 
@@ -96,7 +101,7 @@ export function WalletUtil() {
 	};
 
 	const sendTokenFromFaucet = async (address: string) => {
-		const FCTAmount = 1000;
+		const FCTAmount = 1;
 		const memo = 'faucet';
 
 		const faucetWallet = await SDK().Wallet.fromMnemonic(faucetMnemonic);
@@ -114,6 +119,7 @@ export function WalletUtil() {
 		recoverWallet,
 		getCurrentWallet,
 		getWalletBalance,
+		getBalance,
 		sendToken,
 		sendTokenFromFaucet,
 	};

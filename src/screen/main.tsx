@@ -40,16 +40,9 @@ import {
 } from '@/components/muiComponents';
 import JsonViewer from '@/components/jsonViewer/jsonViewer';
 import useWallet from '@/store/useWallet';
-import { revealKey } from '@/utils/common';
-
-interface ResultLog {
-	code: string;
-	gasUsed: number;
-	gasWanted: number;
-	height: number;
-	transactionHash: string;
-	rawLog: Record<string, string>;
-}
+import { convertBigIntToString, revealKey } from '@/utils/common';
+import { DeliverTxResponse } from '@firmachain/firma-js/dist/sdk/firmachain/common/stargateclient';
+import { FirmaUtil } from '@firmachain/firma-js';
 
 const Video_Background = styled.video`
 	width: 100%;
@@ -61,7 +54,7 @@ export default function Main() {
 	const reCaptchaSiteKey = revealKey(import.meta.env.VITE_RECAPTCHA_SITEKEY) || '';
 	const explorerUrl = import.meta.env.VITE_EXPLORER_URL || '';
 
-	const { SDK, getWalletBalance, sendTokenFromFaucet } = WalletUtil();
+	const { SDK, getWalletBalance, sendTokenFromFaucet, getBalance } = WalletUtil();
 
 	const walletInfo = useWallet();
 
@@ -70,7 +63,7 @@ export default function Main() {
 	const [openRecaptcha, setOpenRecaptcha] = useState(false);
 
 	const [sendingState, setSendingState] = useState(false);
-	const [resultLog, setResultLog] = useState<null | ResultLog>(null);
+	const [resultLog, setResultLog] = useState<null | DeliverTxResponse>(null);
 
 	const [sendAddressInput, setSendAddressInput] = useState('');
 
@@ -134,11 +127,12 @@ export default function Main() {
 			return;
 		}
 
-		//? Disable this line to hide ReCaptcha
-		setOpenRecaptcha(true);
-
-		//? Enable this line to hide ReCaptcha
-		// sendAddress();
+		// If this services static, sending will require Captcha.
+		if (import.meta.env.MODE === 'production') {
+			setOpenRecaptcha(true);
+		} else {
+			sendAddress();
+		}
 	};
 
 	const resetSendStatus = () => {
@@ -152,49 +146,38 @@ export default function Main() {
 	const sendAddress = async () => {
 		if (sendingState) return;
 		handleLoadingOpen(true);
-		setSendingState(true);
 
-		try {
-			let result: any = await sendTokenFromFaucet(sendAddressInput);
-
-			// Result code is not 0, it means request is failed with some reason.
-			const resultCode = result.code === 0 ? 'Success' : result.code;
-			const tmpResult = {
-				code: resultCode,
-				gasUsed: result.gasUsed,
-				gasWanted: result.gasWanted,
-				height: result.height,
-				transactionHash: result.transactionHash,
-				rawLog: result.rawLog,
-			};
-
+		if (!FirmaUtil.isValidAddress(sendAddressInput)) {
+			handleAlertOpen('Please input valid address!', 5000, 'error');
+		} else {
 			try {
-				const parsed = JSON.parse(result.rawLog);
-				tmpResult.rawLog = parsed;
-			} catch (error) {
-				console.log('Result rawLog is not json.');
-				tmpResult.rawLog = { result: tmpResult.rawLog };
+				// Get token balance of current address
+				const curBalance = await getBalance(sendAddressInput);
+				if (Number(curBalance) >= 10) {
+					handleAlertOpen('You cannot claim more tokens.', 5000, 'error');
+				} else {
+					let result: DeliverTxResponse = await sendTokenFromFaucet(sendAddressInput);
+
+					if (result.code !== 0) {
+						handleAlertOpen('Something went wrong. Please try again later.', 5000, 'error');
+					} else {
+						handleAlertClose();
+					}
+
+					setResultLog(result);
+
+					if (walletInfo.walletExist) {
+						let balance = await getWalletBalance();
+						useWallet.getState().setFCTBalance(balance);
+					}
+				}
+			} catch (error: any) {
+				console.log('[error] ' + error);
+				handleAlertOpen(error.message, 5000, 'error');
 			}
-
-			if (result.code !== 0) {
-				handleAlertOpen(result.rawLog, 5000, 'error');
-			} else {
-				handleAlertClose();
-			}
-
-			setResultLog(tmpResult);
-
-			if (walletInfo.walletExist) {
-				let balance = await getWalletBalance();
-				useWallet.getState().setFCTBalance(balance);
-			}
-
-			resetSendStatus();
-		} catch (error: any) {
-			console.log('[error] ' + error);
-			handleAlertOpen(error.message, 5000, 'error');
-			resetSendStatus();
 		}
+
+		resetSendStatus();
 	};
 
 	const handleWalletDrawer = (open: boolean) => {
@@ -298,7 +281,7 @@ export default function Main() {
 						<LogBox>
 							<MainCard>
 								<CardContent>
-									<LogSendTag>{resultLog.code}</LogSendTag>
+									<LogSendTag>{resultLog.code === 0 ? 'Success' : 'Failure'}</LogSendTag>
 									<LogCardWrapper>
 										<MainCardTypo variant="body2" /*component="p"*/>hash</MainCardTypo>
 									</LogCardWrapper>
@@ -312,30 +295,13 @@ export default function Main() {
 											</a>
 										</MainCardTypo>
 									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>gasUsed</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasUsed}</MainCardTypo>
-									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>gasWanted</MainCardTypo>
-										<MainCardTypo variant="body2" /*component="p"*/>{resultLog.gasWanted}</MainCardTypo>
-									</LogCardWrapper>
-									<Divider />
-									<LogCardWrapper>
-										<MainCardTypo variant="body2" /*component="p"*/>rawLog</MainCardTypo>
-									</LogCardWrapper>
-									<LogCardWrapper>
-										<JsonViewer data={resultLog.rawLog} />
-									</LogCardWrapper>
 								</CardContent>
 							</MainCard>
 						</LogBox>
 					)}
 				</ContentsContainer>
 				<FooterBox>
-					<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2023</MainFooterTypo>
+					<MainFooterTypo variant="body1">Copyright © FIRMACHAIN 2025</MainFooterTypo>
 					<MainFooterTypo variant="body1">
 						Maintained By{' '}
 						<a style={{ color: '#1D86FF' }} href="https://firmachain.org/">
