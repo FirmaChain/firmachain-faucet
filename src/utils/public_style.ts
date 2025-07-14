@@ -114,7 +114,7 @@ export const FooterBox = styled.div`
 	position: fixed;
 	bottom: 0;
 	left: 0;
-	background-color: #131316;
+	// background-color: #131316;
 
 	@media (max-width: 770px) {
 		display: inline-block;

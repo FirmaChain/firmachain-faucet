@@ -201,11 +201,8 @@ export default function Main() {
 	return (
 		<>
 			<Container>
-				<BackgroundBlur />
 				<BackgroundBox>
-					<Video_Background muted autoPlay loop>
-						<source src="/assets/binary.mp4" type="video/mp4" />
-					</Video_Background>
+					<img src="/bg.png" alt="background" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
 				</BackgroundBox>
 
 				<ContentsContainer>
