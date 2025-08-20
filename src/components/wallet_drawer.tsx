@@ -9,6 +9,7 @@ import { WalletUtil } from '../utils/wallet_util';
 import { useUtilContext } from '../context/utilContext';
 import { AccountSelect, DisabledTextField, DrawerButton, StyledButton, StyledDivider, StyledTypo } from './muiComponents';
 import useWallet from '@/store/useWallet';
+import { FirmaUtil } from '@firmachain/firma-js';
 
 export default function WalletDrawer({ open, handleWalletDrawer }: { open: boolean; handleWalletDrawer: (v: boolean) => void }) {
 	const { SDK, sendToken, newWallet, getWallet } = WalletUtil();
@@ -127,15 +128,19 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 
 		handleLoadingOpen(true);
 		try {
-			let send = await sendToken(toAddress, amount, memo, walletInfo.accountIndex);
-			let wallet = await getWallet(accountIndex);
+			const send = await sendToken(toAddress, amount, memo, walletInfo.accountIndex);
 
-			resetSendStatus();
-			handleAlertOpen('Send token success', 3000, 'success');
+			if (send.code === 0) {
+				handleAlertOpen('Send token success', 3000, 'success');
+			} else {
+				handleAlertOpen('Send failed', 5000, 'error');
+			}
 		} catch (error: any) {
 			console.log('[error] ' + error);
-			resetSendStatus();
+
 			handleAlertOpen(error.message, 5000, 'error');
+		} finally {
+			resetSendStatus();
 		}
 	};
 
@@ -281,7 +286,11 @@ export default function WalletDrawer({ open, handleWalletDrawer }: { open: boole
 							<DisabledTextField variant="outlined" onChange={onChangeMemo} value={memo} />
 						</ListItem>
 						<Wrapper>
-							<StyledButton variant="contained" onClick={() => setIsSendToken(true)}>
+							<StyledButton
+								variant="contained"
+								disabled={!FirmaUtil.isValidAddress(toAddress) || Number(amount) <= 0}
+								onClick={() => setIsSendToken(true)}
+							>
 								Send
 							</StyledButton>
 						</Wrapper>
