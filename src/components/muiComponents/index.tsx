@@ -77,6 +77,7 @@ export const AccountSelect = styled(Select)({
 });
 
 export const SubTypo = styled(Typography)({
+	display: 'block',
 	padding: '0 10px 0 18px',
 	color: '#888',
 	['@media (max-width: 770px)']: {

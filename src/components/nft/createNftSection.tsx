@@ -1,14 +1,15 @@
-import { IconButton, ListItem } from '@mui/material';
-import FileIcon from '@mui/icons-material/AttachFile';
+import { ListItem } from '@mui/material';
 import { Wrapper } from '@/utils/public_style';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { NftUtil } from '@/utils/nft_util';
 import { useTabTableContext } from '@/context/tabTableContext';
 import { useUtilContext } from '@/context/utilContext';
-import { AttachTextField, DisabledTextField, SectionPaper, StyledButton, StyledTypo, SubTypo, VerticalDivider } from '../muiComponents';
+import { DisabledTextField, StyledButton, StyledTypo, SubTypo } from '../muiComponents';
 import useWallet from '@/store/useWallet';
 import { WalletUtil } from '@/utils/wallet_util';
 import { FirmaUtil } from '@firmachain/firma-js';
+
+const METADATA_EXAMPLE_URL = '/nft-metadata.example.json';
 
 export default function CreateNFTSection({ open }: { open: boolean }) {
 	const { newNft } = NftUtil();
@@ -19,61 +20,42 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 
 	const { handleAlertOpen, handleLoadingOpen } = useUtilContext();
 
-	const [nftFile, setNftFile] = useState<ArrayBuffer | null>(null);
-	const [nftFileName, setNftFileName] = useState<string>('');
-	const [nftFileSize, setNftFileSize] = useState<string>('');
-
-	const [nftName, setNftName] = useState<string>('');
-	const [nftDesc, setNftDesc] = useState<string>('');
+	const [metadataUrl, setMetadataUrl] = useState<string>('');
 	const [nftMemo, setNftMemo] = useState<string>('');
+	const [metadataExample, setMetadataExample] = useState<string>('');
 
 	const [isMintNFT, setIsMintNFT] = useState(false);
 
-	const onChangeNftName = (event: ChangeEvent<HTMLInputElement>) => {
-		setNftName(event.target.value);
-	};
+	useEffect(() => {
+		let ignore = false;
 
-	const onChangeNftDesc = (event: ChangeEvent<HTMLInputElement>) => {
-		setNftDesc(event.target.value);
+		fetch(METADATA_EXAMPLE_URL)
+			.then((response) => {
+				if (!response.ok) throw new Error('Failed to load metadata example.');
+				return response.text();
+			})
+			.then((text) => {
+				if (!ignore) setMetadataExample(text.trim());
+			})
+			.catch(() => {
+				if (!ignore) setMetadataExample('');
+			});
+
+		return () => {
+			ignore = true;
+		};
+	}, []);
+
+	const onChangeMetadataUrl = (event: ChangeEvent<HTMLInputElement>) => {
+		setMetadataUrl(event.target.value);
 	};
 
 	const onChangeNftMemo = (event: ChangeEvent<HTMLInputElement>) => {
 		setNftMemo(event.target.value);
 	};
 
-	const fileChangedHandler = (event: ChangeEvent<HTMLInputElement>) => {
-		event.preventDefault();
-
-		const reader = new FileReader();
-
-		const file = event.target.files ? event.target.files[0] : undefined;
-
-		if (file === undefined) return;
-
-		reader.readAsArrayBuffer(file);
-
-		reader.onload = function () {
-			if (file) {
-				if (file.size / 1024 / 1024 > 20) {
-					// file limit
-					handleAlertOpen('File size exceeds the allowable limit of 20MB', 3000, 'error');
-					return;
-				}
-
-				setNftFileSize((file.size / 1024 / 1024).toFixed(2));
-				setNftFileName(file.name);
-
-				setNftFile(reader.result as ArrayBuffer);
-			}
-		};
-
-		reader.onerror = function () {
-			console.log(reader.error);
-		};
-	};
-
 	const mintNFT = async () => {
-		if (nftFile === null || nftName === '' || nftDesc === '') return;
+		if (metadataUrl.trim() === '') return;
 
 		const defaultFee = FirmaUtil.getFCTStringFromUFCT(SDK().Config.defaultFee);
 
@@ -85,7 +67,7 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 		handleLoadingOpen(true);
 		setIsMintNFT(true);
 		try {
-			let result = await newNft(nftFile, replaceTextData(nftName), replaceTextData(nftDesc), nftMemo);
+			await newNft(metadataUrl.trim(), nftMemo);
 
 			handleNFTButtons('list');
 			handleAlertOpen('Created new NFT', 3000, 'success');
@@ -99,39 +81,40 @@ export default function CreateNFTSection({ open }: { open: boolean }) {
 		}
 	};
 
-	const replaceTextData = (text: string) => {
-		let inputText = text.replace('\n', '\\n');
-		return inputText;
-	};
-
 	return (
 		<>
-			<StyledTypo variant="body2">Attach Image File</StyledTypo>
+			<StyledTypo variant="body2">Metadata JSON URL</StyledTypo>
+			<SubTypo variant="caption">Required fields: name, description, and path.</SubTypo>
+			<SubTypo variant="caption">'path' is an image URL.</SubTypo>
+			{metadataExample && (
+				<pre
+					style={{
+						margin: '8px 10px 0',
+						padding: '8px',
+						backgroundColor: '#222',
+						color: '#ddd',
+						fontSize: '11px',
+						lineHeight: 1.4,
+						borderRadius: '3px',
+						overflowX: 'auto',
+						whiteSpace: 'pre-wrap',
+						wordBreak: 'break-all',
+					}}
+				>
+					{metadataExample}
+				</pre>
+			)}
 			<ListItem>
-				<SectionPaper>
-					<AttachTextField disabled value={nftFileName + (nftFileName && ` (${nftFileSize} MB)`)} />
-					<VerticalDivider orientation="vertical" />
-					<IconButton color="primary" component="label">
-						<FileIcon />
-						<input
-							id={'ntf_file_input'}
-							style={{ display: 'none' }}
-							type="file"
-							name="imageFile"
-							accept="image/*"
-							onChange={fileChangedHandler}
-						/>
-					</IconButton>
-				</SectionPaper>
+				<a
+					href={METADATA_EXAMPLE_URL}
+					download="nft-metadata.example.json"
+					style={{ color: 'rgb(29, 134, 255)', fontSize: '13px' }}
+				>
+					Download example
+				</a>
 			</ListItem>
-			<SubTypo variant="body2">(Maximum file size : 20MB)</SubTypo>
-			<StyledTypo variant="body2">Name</StyledTypo>
 			<ListItem>
-				<DisabledTextField variant="outlined" onChange={onChangeNftName} value={nftName} />
-			</ListItem>
-			<StyledTypo variant="body2">Description</StyledTypo>
-			<ListItem>
-				<DisabledTextField multiline maxRows={5} variant="outlined" onChange={onChangeNftDesc} value={nftDesc} />
+				<DisabledTextField variant="outlined" onChange={onChangeMetadataUrl} value={metadataUrl} />
 			</ListItem>
 			<StyledTypo variant="body2">Memo</StyledTypo>
 			<ListItem>
